@@ -1,0 +1,46 @@
+// إعداد الاتصال بقاعدة البيانات (Supabase)
+datasource db {
+  provider = "postgresql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// جدول الأقسام (سياسة، رياضة، إلخ)
+model Category {
+  id    String @id @default(cuid())
+  name  String @unique
+  slug  String @unique
+  posts Post[]
+}
+
+// جدول الأخبار (المقالات)
+model Post {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  content        String   @db.Text
+  excerpt        String?  // ملخص قصير للخبر يظهر في جوجل
+  mainImage      String   // هنا سنخزن رابط الصورة القادم من Cloudflare R2
+  published      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // علاقة مع القسم
+  categoryId     String
+  category       Category @relation(fields: [categoryId], references: [id])
+
+  // حقول السيو (SEO) لضمان الأرشفة الاحترافية
+  metaTitle      String?
+  metaDescription String?
+  keywords       String?
+}
+
+// جدول المشرفين (لوحة التحكم)
+model User {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+  name     String?
+}
