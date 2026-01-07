@@ -8,7 +8,13 @@ declare global {
   var prisma: PrismaClient | undefined;
 }
 
-const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL })
+const connectionString = process.env.DATABASE_URL
+
+if (!connectionString) {
+  console.warn("⚠️ DATABASE_URL is not defined. Prisma might not work correctly during build.")
+}
+
+const pool = new pg.Pool({ connectionString })
 const adapter = new PrismaPg(pool)
 const prisma = globalThis.prisma ?? new PrismaClient({ adapter });
 

@@ -24,75 +24,92 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   const { slug } = await params;
-  const post = await prisma.post.findUnique({
-    where: { slug },
-    include: { category: true, author: true }
-  });
+  
+  try {
+    const post = await prisma.post.findUnique({
+      where: { slug },
+      include: { category: true, author: true }
+    });
 
-  if (!post) return { title: "الخبر غير موجود" };
+    if (!post) return { title: "الخبر غير موجود" };
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://your-site.com';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://your-site.com';
 
-  return {
-    title: `${post.title} | أخبارنا`,
-    description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
-    keywords: post.keywords?.join(', '),
-    alternates: {
-      canonical: `${baseUrl}/news/${post.slug}`,
-    },
-    openGraph: {
-      title: post.title,
+    return {
+      title: `${post.title} | أخبارنا`,
       description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
-      url: `${baseUrl}/news/${post.slug}`,
-      siteName: 'موقع أخبارنا',
-      locale: 'ar_SA',
-      type: 'article',
-      publishedTime: post.createdAt.toISOString(),
-      modifiedTime: post.updatedAt.toISOString(),
-      authors: [post.author?.name || 'الكاتب'],
-      section: post.category.name,
-      images: post.mainImage ? [{ url: post.mainImage }] : [],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
-      images: post.mainImage ? [post.mainImage] : [],
-    },
-  };
+      keywords: post.keywords?.join(', '),
+      alternates: {
+        canonical: `${baseUrl}/news/${post.slug}`,
+      },
+      openGraph: {
+        title: post.title,
+        description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
+        url: `${baseUrl}/news/${post.slug}`,
+        siteName: 'موقع أخبارنا',
+        locale: 'ar_SA',
+        type: 'article',
+        publishedTime: post.createdAt.toISOString(),
+        modifiedTime: post.updatedAt.toISOString(),
+        authors: [post.author?.name || 'الكاتب'],
+        section: post.category.name,
+        images: post.mainImage ? [{ url: post.mainImage }] : [],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: post.title,
+        description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
+        images: post.mainImage ? [post.mainImage] : [],
+      },
+    };
+  } catch (error) {
+    console.error("Error generating metadata:", error);
+    return { title: "أخبارنا" };
+  }
 }
 
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
 
-  const post = await prisma.post.findUnique({
-    where: { slug },
-    include: {
-      category: true,
-      author: true,
-    },
-  });
+  let post = null;
+  let relatedPosts: any[] = [];
+
+  try {
+    post = await prisma.post.findUnique({
+      where: { slug },
+      include: {
+        category: true,
+        author: true,
+      },
+    });
+
+    if (post && post.published) {
+      // زيادة عدد المشاهدات فقط في بيئة الإنتاج وليس أثناء البناء
+      if (process.env.NODE_ENV === 'production') {
+        await prisma.post.update({
+          where: { id: post.id },
+          data: { views: { increment: 1 } }
+        }).catch(() => {});
+      }
+
+      // جلب أخبار متعلقة
+      relatedPosts = await prisma.post.findMany({
+        where: {
+          categoryId: post.categoryId,
+          id: { not: post.id },
+          published: true
+        },
+        take: 3,
+        orderBy: { createdAt: 'desc' }
+      });
+    }
+  } catch (error) {
+    console.error("Error fetching post data:", error);
+  }
 
   if (!post || !post.published) {
     notFound();
   }
-
-  // زيادة عدد المشاهدات
-  await prisma.post.update({
-    where: { id: post.id },
-    data: { views: { increment: 1 } }
-  }).catch(() => {}); // نتجاهل الخطأ إذا فشل تحديث المشاهدات لضمان سرعة الصفحة
-
-  // جلب أخبار متعلقة
-  const relatedPosts = await prisma.post.findMany({
-    where: {
-      categoryId: post.categoryId,
-      id: { not: post.id },
-      published: true
-    },
-    take: 3,
-    orderBy: { createdAt: 'desc' }
-  });
 
   // حساب وقت القراءة التقريبي
   const wordsPerMinute = 200;
