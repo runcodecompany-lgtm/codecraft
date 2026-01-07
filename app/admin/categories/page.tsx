@@ -13,9 +13,9 @@ type CategoryType = {
 
 export default async function CategoriesPage() {
   // تعديل هنا: تعريف النوع صراحة
-  const categories = (await prisma.category.findMany({
+  const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' }
-  })) as CategoryType[]
+  })
 
   return (
     <div className="p-6">
@@ -44,7 +44,7 @@ export default async function CategoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {categories.map((category) => (
+              {categories.map((category: CategoryType) => (
                 <tr key={category.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-700">{category.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 font-mono">{category.slug}</td>
