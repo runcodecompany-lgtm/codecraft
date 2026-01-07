@@ -2,17 +2,15 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaPg } from '@prisma/adapter-pg'
 import pg from 'pg'
 
-const connectionString = process.env.DATABASE_URL
-
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
 const createPrismaClient = () => {
-  if (!connectionString) {
-    // Fallback for build time if env is missing, though it should be caught earlier
-    return new PrismaClient()
-  }
+  // استخدام رابط وهمي لتجاوز خطأ التهيئة في حالة غياب المتغير البيئي أثناء البناء
+  // هذا يسمح للعميل بالعمل، وستفشل الاستعلامات الفعلية وسيتم اصطيادها في try/catch
+  const connectionString = process.env.DATABASE_URL || "postgresql://dummy:dummy@localhost:5432/dummy"
+  
   const pool = new pg.Pool({ connectionString })
   const adapter = new PrismaPg(pool)
   return new PrismaClient({ adapter })
