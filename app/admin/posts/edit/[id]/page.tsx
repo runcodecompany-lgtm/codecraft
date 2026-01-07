@@ -30,7 +30,11 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
         <PostForm 
           categories={categories} 
           authorId={user?.id || ''} 
-          initialData={post}
+          initialData={{
+            ...post,
+            mainImage: post.mainImage || undefined,
+            keywords: post.keywords || []
+          }}
         />
       </div>
     </div>
