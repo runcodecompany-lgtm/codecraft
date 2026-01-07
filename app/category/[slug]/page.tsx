@@ -56,32 +56,44 @@ export async function generateMetadata(
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
+  
+  let category;
+  let posts: PostType[] = [];
 
-  const category = await prisma.category.findUnique({
-    where: { slug },
-    include: {
-      _count: {
-        select: { posts: { where: { published: true } } }
+  try {
+    category = await prisma.category.findUnique({
+      where: { slug },
+      include: {
+        _count: {
+          select: { posts: { where: { published: true } } }
+        }
       }
+    });
+
+    if (category) {
+      posts = await prisma.post.findMany({
+        where: {
+          categoryId: category.id,
+          published: true
+        },
+        orderBy: {
+          createdAt: 'desc'
+        },
+        include: {
+          author: true
+        }
+      }) as PostType[];
     }
-  });
+  } catch (error) {
+    console.error(`Failed to fetch category data for slug ${slug}:`, error);
+    // يمكننا هنا رمي الخطأ ليتم التعامل معه بواسطة error.tsx أو إظهار صفحة فارغة
+    // سنقوم برمي الخطأ ليظهر في صفحة الخطأ المخصصة
+    throw error;
+  }
 
   if (!category) {
     notFound();
   }
-
-  const posts = await prisma.post.findMany({
-    where: {
-      categoryId: category.id,
-      published: true
-    },
-    orderBy: {
-      createdAt: 'desc'
-    },
-    include: {
-      author: true
-    }
-  }) as PostType[]; // تحديد النوع هنا اختياري لكن آمن
 
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
