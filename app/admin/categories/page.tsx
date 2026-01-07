@@ -3,9 +3,12 @@ import { Plus, Edit2, Trash2 } from 'lucide-react'
 import { createCategory, deleteCategory } from '@/lib/actions'
 import CategoryForm from '@/components/category-form'
 import DeleteCategoryButton from '@/components/delete-category-button'
+import { Category } from '@prisma/client'
+
 
 export default async function CategoriesPage() {
-  const categories = await prisma.category.findMany({
+  const categories: Category[] = await prisma.category.findMany({
+
     orderBy: { name: 'asc' }
   })
 
@@ -36,7 +39,7 @@ export default async function CategoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {categories.map((category: any) => (
+              {categories.map((category) => (
                 <tr key={category.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-700">{category.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 font-mono">{category.slug}</td>
