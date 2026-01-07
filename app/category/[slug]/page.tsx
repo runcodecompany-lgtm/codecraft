@@ -17,6 +17,20 @@ interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// تعريف نوع البوست بشكل صريح
+type PostType = {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt?: string;
+  mainImage?: string;
+  createdAt: Date;
+  author?: {
+    name?: string;
+  };
+};
+
 export async function generateMetadata(
   { params }: CategoryPageProps,
   parent: ResolvingMetadata
@@ -66,7 +80,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     include: {
       author: true
     }
-  });
+  }) as PostType[]; // تحديد النوع هنا اختياري لكن آمن
 
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
@@ -106,7 +120,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <main className="container mx-auto px-4 py-12">
         {posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post, index) => (
+            {posts.map((post: PostType, index) => (  // <-- هنا تم تحديد النوع صراحة
               <article 
                 key={post.id} 
                 className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"
