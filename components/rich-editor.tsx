@@ -67,17 +67,21 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
   }, [editor])
 
-  const resizeImage = useCallback(() => {
-    const { src, width, height } = editor.getAttributes('image')
+  const editImage = useCallback(() => {
+    const { src, width, height, alt } = editor.getAttributes('image')
     const newWidth = window.prompt('العرض (مثلاً 100% أو 400px):', width || '100%')
-    const newHeight = window.prompt('الارتفاع (اختياري - اتركه فارغاً للضبط التلقائي):', height || '')
+    
+    if (newWidth === null) return // cancelled
 
-    if (newWidth !== null) {
-      editor.chain().focus().updateAttributes('image', { 
-        width: newWidth, 
-        height: newHeight || 'auto' 
-      }).run()
-    }
+    const newHeight = window.prompt('الارتفاع (اختياري - اتركه فارغاً للضبط التلقائي):', height || '')
+    const newAlt = window.prompt('وصف الصورة (Alt Text):', alt || '')
+
+    editor.chain().focus().updateAttributes('image', { 
+      width: newWidth, 
+      height: newHeight || 'auto',
+      alt: newAlt || null,
+      title: newAlt || null
+    }).run()
   }, [editor])
 
   if (!editor) {
@@ -101,7 +105,8 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
         
         if (url) {
           // 4. إدراج الصورة النهائية
-          editor.chain().focus().setImage({ src: url }).run()
+          const altText = prompt('أدخل وصفاً للصورة (اختياري):', '')
+          editor.chain().focus().setImage({ src: url, alt: altText || undefined, title: altText || undefined }).run()
         }
       } catch (error) {
         console.error('Upload failed:', error)
@@ -299,12 +304,12 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
 
       <button
         type="button"
-        onClick={resizeImage}
+        onClick={editImage}
         disabled={!editor.isActive('image')}
         className={`p-2 rounded-md hover:bg-white hover:shadow-sm transition-all ${
           editor.isActive('image') ? 'text-blue-600' : 'text-gray-400 opacity-50'
         }`}
-        title="تغيير حجم الصورة"
+        title="تعديل الصورة (الحجم والوصف)"
       >
         <Maximize className="w-4 h-4" />
       </button>

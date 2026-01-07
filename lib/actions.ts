@@ -74,6 +74,7 @@ type CreatePostData = {
   content: string
   categoryId: string
   mainImage?: string | null
+  mainImageDescription?: string | null
   authorId: string
   keywords?: string[]
 }
@@ -102,6 +103,7 @@ export async function createPost(data: CreatePostData) {
         content: data.content,
         categoryId: data.categoryId,
         mainImage: data.mainImage ?? undefined,
+        mainImageDescription: data.mainImageDescription ?? undefined,
         authorId: data.authorId,
         keywords: data.keywords || [],
         published: true
@@ -122,6 +124,7 @@ type UpdatePostData = {
   content: string
   categoryId: string
   mainImage?: string | null
+  mainImageDescription?: string | null
   authorId?: string
   keywords?: string[]
 }
@@ -149,6 +152,7 @@ export async function updatePost(id: string, data: UpdatePostData) {
         content: data.content,
         categoryId: data.categoryId,
         mainImage: data.mainImage ?? undefined,
+        mainImageDescription: data.mainImageDescription ?? undefined,
         keywords: data.keywords || [],
         ...(data.authorId && { authorId: data.authorId })
       }

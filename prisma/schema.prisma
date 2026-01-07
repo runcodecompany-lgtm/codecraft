@@ -15,6 +15,7 @@ model Post {
   content     String   @db.Text
   excerpt     String?  @db.Text
   mainImage   String?  // رابط الصورة في R2 أو Supabase
+  mainImageDescription String? // وصف الصورة الرئيسية
   keywords    String[] // الكلمات المفتاحية
   published   Boolean  @default(false)
   authorId    String

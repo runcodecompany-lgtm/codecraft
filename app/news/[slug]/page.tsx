@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Clock
 } from "lucide-react";
+import { Post } from "@/types";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -72,8 +73,8 @@ export async function generateMetadata(
 export default async function PostPage({ params }: PostPageProps) {
   const { slug } = await params;
 
-  let post = null;
-  let relatedPosts: any[] = [];
+  let post: Post | null = null;
+  let relatedPosts: Post[] = [];
 
   try {
     post = await prisma.post.findUnique({
@@ -82,7 +83,7 @@ export default async function PostPage({ params }: PostPageProps) {
         category: true,
         author: true,
       },
-    });
+    }) as unknown as Post | null;
 
     if (post && post.published) {
       // زيادة عدد المشاهدات فقط في بيئة الإنتاج وليس أثناء البناء
@@ -102,7 +103,7 @@ export default async function PostPage({ params }: PostPageProps) {
         },
         take: 3,
         orderBy: { createdAt: 'desc' }
-      });
+      }) as unknown as Post[];
     }
   } catch (error) {
     console.error("Error fetching post data:", error);
@@ -155,8 +156,8 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="container mx-auto px-4 py-3 flex items-center text-sm text-gray-600">
           <Link href="/" className="hover:text-blue-600 transition-colors">الرئيسية</Link>
           <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
-          <Link href={`/category/${post.category.slug}`} className="hover:text-blue-600 transition-colors">
-            {post.category.name}
+          <Link href={`/category/${post.category?.slug || ''}`} className="hover:text-blue-600 transition-colors">
+{post.category?.name || 'غير مصنف'}
           </Link>
           <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />
           <span className="text-gray-400 truncate max-w-[200px]">{post.title}</span>
@@ -167,10 +168,10 @@ export default async function PostPage({ params }: PostPageProps) {
         <div className="max-w-4xl mx-auto">
           {/* Category Badge */}
           <Link 
-            href={`/category/${post.category.slug}`}
+            href={`/category/${post.category?.slug || ''}`}
             className="inline-block px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-md mb-6 hover:bg-blue-700 transition-colors"
           >
-            {post.category.name}
+            {post.category?.name || 'غير مصنف'}
           </Link>
 
           {/* Headline */}
@@ -234,16 +235,23 @@ export default async function PostPage({ params }: PostPageProps) {
 
           {/* Featured Image */}
           {post.mainImage && (
-            <div className="relative aspect-video w-full mb-10 rounded-2xl overflow-hidden shadow-2xl">
-              <Image
-                src={post.mainImage}
-                alt={post.title}
-                fill
-                priority
-                className="object-cover"
-                sizes="(max-width: 1024px) 100vw, 1024px"
-              />
-            </div>
+            <figure className="mb-10">
+              <div className="relative aspect-video w-full rounded-2xl overflow-hidden shadow-2xl">
+                <Image
+                  src={post.mainImage}
+                  alt={post.mainImageDescription || post.title}
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 1024px"
+                />
+              </div>
+              {post.mainImageDescription && (
+                <figcaption className="text-center text-gray-500 text-sm mt-3">
+                  {post.mainImageDescription}
+                </figcaption>
+              )}
+            </figure>
           )}
 
           {/* Excerpt */}
@@ -279,7 +287,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 ) : (
                   <>
                     <span className="px-4 py-1.5 bg-gray-50 text-gray-600 text-sm font-medium rounded-full border border-gray-100">#أخبار</span>
-                    <span className="px-4 py-1.5 bg-gray-50 text-gray-600 text-sm font-medium rounded-full border border-gray-100">#{post.category.name}</span>
+                    <span className="px-4 py-1.5 bg-gray-50 text-gray-600 text-sm font-medium rounded-full border border-gray-100">#{post.category?.name || 'غير مصنف'}</span>
                   </>
                 )}
               </div>
@@ -294,7 +302,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 أخبار قد تهمك
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedPosts.map((related: any) => (
+                {relatedPosts.map((related: Post) => (
                   <Link 
                     key={related.id} 
                     href={`/news/${related.slug}`}

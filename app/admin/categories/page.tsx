@@ -4,13 +4,7 @@ import { Plus, Edit2, Trash2 } from 'lucide-react'
 import { createCategory, deleteCategory } from '@/lib/actions'
 import CategoryForm from '@/components/category-form'
 import DeleteCategoryButton from '@/components/delete-category-button'
-
-// تعريف نوع Category من Prisma أو باستخدام Type Assertion
-type CategoryType = {
-  id: string
-  name: string
-  slug: string
-}
+import { Category } from '@/types'
 
 export default async function CategoriesPage() {
   // تعديل هنا: تعريف النوع صراحة
@@ -45,7 +39,7 @@ export default async function CategoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {categories.map((category: CategoryType) => (
+              {categories.map((category: Category) => (
                 <tr key={category.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-700">{category.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 font-mono">{category.slug}</td>

@@ -25,6 +25,7 @@ interface PostFormProps {
     content: string
     categoryId: string
     mainImage?: string
+    mainImageDescription?: string | null
     keywords?: string[]
   }
 }
@@ -35,6 +36,7 @@ export default function PostForm({ categories, authorId, initialData }: PostForm
   const [error, setError] = useState('')
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string>(initialData?.mainImage || '')
+  const [mainImageDescription, setMainImageDescription] = useState(initialData?.mainImageDescription || '')
 
   const [title, setTitle] = useState(initialData?.title || '')
   const [slug, setSlug] = useState(initialData?.slug || '')
@@ -81,6 +83,7 @@ export default function PostForm({ categories, authorId, initialData }: PostForm
         content,
         categoryId,
         mainImage: mainImageUrl,
+        mainImageDescription,
         keywords,
         authorId
       }
@@ -171,6 +174,16 @@ export default function PostForm({ categories, authorId, initialData }: PostForm
                 <input type="file" onChange={handleImageChange} className="hidden" accept="image/*" />
               </label>
             )}
+          </div>
+          <div className="mt-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1">وصف الصورة البارزة (Alt Text)</label>
+            <input
+              value={mainImageDescription}
+              onChange={(e) => setMainImageDescription(e.target.value)}
+              type="text"
+              className="w-full p-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+              placeholder="وصف للصورة لمحركات البحث..."
+            />
           </div>
         </div>
       </div>

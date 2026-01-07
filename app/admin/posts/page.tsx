@@ -3,6 +3,7 @@ import { Plus, Edit2, Trash2, Eye } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import DeletePostButton from '@/components/delete-post-button'
+import { Post } from '@/types'
 
 export default async function PostsPage() {
   const posts = await prisma.post.findMany({
@@ -34,7 +35,7 @@ export default async function PostsPage() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {posts.map((post: any) => (
+            {posts.map((post: Post) => (
               <tr key={post.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-4">
@@ -57,7 +58,7 @@ export default async function PostsPage() {
                 </td>
                 <td className="px-6 py-4">
                   <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full">
-                    {post.category.name}
+{post.category?.name ?? 'بدون قسم'}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">

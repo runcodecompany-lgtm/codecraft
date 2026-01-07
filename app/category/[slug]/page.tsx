@@ -13,24 +13,11 @@ import {
   Clock,
   TrendingUp
 } from "lucide-react";
+import { Post } from "@/types";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
-
-// تعريف نوع البوست بشكل صريح
-type PostType = {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  excerpt?: string;
-  mainImage?: string;
-  createdAt: Date;
-  author?: {
-    name?: string;
-  };
-};
 
 export async function generateMetadata(
   { params }: CategoryPageProps,
@@ -58,7 +45,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const { slug } = await params;
   
   let category;
-  let posts: PostType[] = [];
+  let posts: Post[] = [];
 
   try {
     category = await prisma.category.findUnique({
@@ -82,7 +69,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         include: {
           author: true
         }
-      }) as PostType[];
+      }) as unknown as Post[];
     }
   } catch (error) {
     console.error(`Failed to fetch category data for slug ${slug}:`, error);
@@ -133,7 +120,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       <main className="container mx-auto px-4 py-12">
         {posts.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {posts.map((post: PostType, index) => (  // <-- هنا تم تحديد النوع صراحة
+            {posts.map((post, index) => (
               <article 
                 key={post.id} 
                 className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 flex flex-col"

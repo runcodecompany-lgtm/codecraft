@@ -34,6 +34,7 @@ export default async function EditPostPage({ params }: { params: Promise<{ id: s
           initialData={{
             ...post,
             mainImage: post.mainImage || undefined,
+            mainImageDescription: post.mainImageDescription || undefined,
             keywords: post.keywords || []
           }}
         />
