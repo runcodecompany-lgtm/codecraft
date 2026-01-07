@@ -36,7 +36,7 @@ export default async function CategoriesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {categories.map((category) => (
+              {categories.map((category: { id: string; name: string; slug: string }) => (
                 <tr key={category.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-700">{category.name}</td>
                   <td className="px-6 py-4 text-sm text-gray-500 font-mono">{category.slug}</td>

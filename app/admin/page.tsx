@@ -44,7 +44,7 @@ export default async function AdminDashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {stats.map((stat) => (
+        {stats.map((stat: any) => (
           <div 
             key={stat.name}
             className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4 space-x-reverse"
@@ -71,7 +71,7 @@ export default async function AdminDashboard() {
         </div>
         
         <div className="divide-y divide-gray-100">
-          {recentPosts.map((post) => (
+          {recentPosts.map((post: any) => (
             <div key={post.id} className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center">
               <div className="flex flex-col gap-1">
                 <span className="font-medium text-gray-800 line-clamp-1">{post.title}</span>

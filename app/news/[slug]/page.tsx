@@ -250,7 +250,7 @@ export default async function PostPage({ params }: PostPageProps) {
               </div>
               <div className="flex flex-wrap gap-2">
                 {post.keywords && post.keywords.length > 0 ? (
-                  post.keywords.map((keyword, index) => (
+                  post.keywords.map((keyword: string, index: number) => (
                     <span 
                       key={index}
                       className="px-4 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-full border border-blue-100 hover:bg-blue-100 transition-colors cursor-default"
@@ -276,7 +276,7 @@ export default async function PostPage({ params }: PostPageProps) {
                 أخبار قد تهمك
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {relatedPosts.map((related) => (
+                {relatedPosts.map((related: any) => (
                   <Link 
                     key={related.id} 
                     href={`/news/${related.slug}`}

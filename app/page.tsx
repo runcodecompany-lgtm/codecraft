@@ -53,7 +53,7 @@ export default function Home() {
           {/* الأخبار الجانبية */}
           <div className="flex flex-col gap-6">
             <h3 className="text-xl font-bold border-r-4 border-red-600 pr-3">الأكثر قراءة</h3>
-            {[1, 2, 3].map((i) => (
+            {[1, 2, 3].map((i: number) => (
               <div key={i} className="flex gap-4 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                 <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden relative">
                   <Image 
@@ -80,7 +80,7 @@ export default function Home() {
       <section className="container mx-auto px-4 py-8">
         <h3 className="text-2xl font-bold mb-6 border-b-2 border-gray-200 pb-2">آخر الأخبار</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((item) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((item: number) => (
             <div key={item} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-100">
               <div className="h-48 bg-gray-200 relative">
                 <Image 
