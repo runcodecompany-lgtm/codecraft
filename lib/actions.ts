@@ -110,6 +110,10 @@ export async function createPost(data: CreatePostData) {
       }
     })
 
+    // إعادة التحقق من المسارات لتحديث الـ SEO والصفحات العامة فوراً
+    revalidatePath("/")
+    revalidatePath("/sitemap.xml")
+    revalidatePath(`/news/${data.slug}`)
     revalidatePath("/admin/posts")
     return { success: true }
   } catch (error) {
@@ -158,6 +162,10 @@ export async function updatePost(id: string, data: UpdatePostData) {
       }
     })
 
+    // إعادة التحقق من المسارات لتحديث الـ SEO والصفحات العامة فوراً
+    revalidatePath("/")
+    revalidatePath("/sitemap.xml")
+    revalidatePath(`/news/${data.slug}`)
     revalidatePath("/admin/posts")
     return { success: true }
   } catch (error) {
