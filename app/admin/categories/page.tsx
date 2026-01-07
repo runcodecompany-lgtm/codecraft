@@ -3,14 +3,19 @@ import { Plus, Edit2, Trash2 } from 'lucide-react'
 import { createCategory, deleteCategory } from '@/lib/actions'
 import CategoryForm from '@/components/category-form'
 import DeleteCategoryButton from '@/components/delete-category-button'
-import { Category } from '@prisma/client'
 
+// تعريف نوع Category من Prisma أو باستخدام Type Assertion
+type CategoryType = {
+  id: string
+  name: string
+  slug: string
+}
 
 export default async function CategoriesPage() {
-  const categories: Category[] = await prisma.category.findMany({
-
+  // تعديل هنا: تعريف النوع صراحة
+  const categories = (await prisma.category.findMany({
     orderBy: { name: 'asc' }
-  })
+  })) as CategoryType[]
 
   return (
     <div className="p-6">
