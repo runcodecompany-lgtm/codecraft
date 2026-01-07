@@ -24,17 +24,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50 text-right" dir="rtl">
       {/* Header - شريط التنقل */}
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-red-600">أخبارنا</h1>
-          <nav className="hidden md:flex gap-6 font-medium">
-            <a href="#" className="hover:text-red-600">الرئيسية</a>
-            <a href="#" className="hover:text-red-600">سياسة</a>
-            <a href="#" className="hover:text-red-600">تقنية</a>
-            <a href="#" className="hover:text-red-600">رياضة</a>
-          </nav>
-        </div>
-      </header>
+      
 
       {/* Hero Section - الخبر الرئيسي */}
       <section className="container mx-auto px-4 py-8">
