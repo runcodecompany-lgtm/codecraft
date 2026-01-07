@@ -7,9 +7,13 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 const createPrismaClient = () => {
+  // التحقق من وجود متغير البيئة
+  const url = process.env.DATABASE_URL
+  console.log(`Prisma Init: DATABASE_URL is ${url ? 'DEFINED' : 'UNDEFINED'}`)
+
   // استخدام رابط وهمي لتجاوز خطأ التهيئة في حالة غياب المتغير البيئي أثناء البناء
   // هذا يسمح للعميل بالعمل، وستفشل الاستعلامات الفعلية وسيتم اصطيادها في try/catch
-  const connectionString = process.env.DATABASE_URL || "postgresql://dummy:dummy@localhost:5432/dummy"
+  const connectionString = url || "postgresql://dummy:dummy@localhost:5432/dummy"
   
   const pool = new pg.Pool({ connectionString })
   const adapter = new PrismaPg(pool)
