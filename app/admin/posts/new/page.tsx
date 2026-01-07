@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import prisma from '@/lib/prisma'
 import PostForm from '@/components/post-form'
 import { createClient } from '@/utils/supabase/server'

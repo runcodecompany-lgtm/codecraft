@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { Users, Target, Award, Globe, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";

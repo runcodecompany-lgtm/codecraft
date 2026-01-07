@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import prisma from '@/lib/prisma'
 import { Plus, Edit2, Trash2 } from 'lucide-react'
 import { createCategory, deleteCategory } from '@/lib/actions'

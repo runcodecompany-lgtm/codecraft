@@ -1,5 +1,5 @@
 'use client'
-
+export const dynamic = 'force-dynamic';
 import React, { useState, KeyboardEvent } from 'react'
 import { X } from 'lucide-react'
 

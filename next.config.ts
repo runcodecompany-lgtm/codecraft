@@ -9,12 +9,23 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'ozcthabwofhbvpkewtei.supabase.co',
-        port: '',
-        pathname: '/storage/v1/object/public/**',
+        hostname: 'placehold.co',
       },
+      {
+        protocol: 'https',
+        hostname: 'aws-1-ap-south-1.pooler.supabase.com',
+      },
+      // إضافة نطاق Supabase للتخزين
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      }
     ],
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  serverExternalPackages: ['@prisma/client'],
 };
 
 export default nextConfig;

@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import prisma from '@/lib/prisma'
 import { FileText, Layers, TrendingUp, Calendar, ArrowRight } from 'lucide-react'
 import Link from 'next/link'

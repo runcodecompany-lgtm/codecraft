@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { ShieldCheck, Lock, Eye, FileText, ChevronRight } from "lucide-react";
 import Link from "next/link";
 

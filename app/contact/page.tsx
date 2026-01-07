@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Globe } from "lucide-react";
 
 export const metadata = {

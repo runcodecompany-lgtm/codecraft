@@ -1,14 +1,19 @@
-// middleware.ts
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
-import { NextResponse, type NextRequest } from 'next/server'
 
-export async function middleware(request: NextRequest) {
+/**
+ * في Next.js 16، يتم استبدال middleware.ts بـ proxy.ts
+ * ويجب تصدير دالة باسم 'proxy' أو تصديرها كـ default.
+ */
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
+  // إنشاء عميل Supabase خاص بالخادم للتعامل مع الجلسات
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -39,16 +44,23 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // التحقق من حالة المستخدم
   const { data: { user } } = await supabase.auth.getUser()
 
-  // إذا حاول المستخدم دخول لوحة التحكم وهو غير مسجل، حوله لصفحة تسجيل الدخول
+  // منطق الحماية: إذا حاول غير المسجل دخول /admin يتم تحويله
   if (!user && request.nextUrl.pathname.startsWith('/admin')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const url = request.nextUrl.clone()
+    url.pathname = '/login'
+    return NextResponse.redirect(url)
   }
 
   return response
 }
 
+// التصدير الافتراضي لضمان توافق Next.js 16
+export default proxy;
+
+// تحديد المسارات التي سيتم تطبيق الـ Proxy عليها
 export const config = {
-  matcher: ['/admin/:path*'], // حماية أي مسار يبدأ بـ /admin
+  matcher: ['/admin/:path*'],
 }
