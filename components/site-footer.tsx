@@ -12,8 +12,11 @@ export default async function SiteFooter() {
       }
     })
   } catch (error) {
-    console.error("Failed to fetch categories for footer:", error)
-    // يمكننا إضافة تصنيفات افتراضية هنا إذا أردنا
+    if ((error as any)?.code === 'P1001') {
+      console.warn("Footer: Database unreachable (likely using dummy connection). Footer links will be empty.")
+    } else {
+      console.error("Failed to fetch categories for footer:", error)
+    }
   }
 
   return <Footer categories={categories} />

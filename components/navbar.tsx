@@ -12,7 +12,13 @@ export default async function Navbar() {
       }
     })
   } catch (error) {
-    console.error("Failed to fetch categories for navbar:", error)
+    // التحقق مما إذا كان الخطأ بسبب الاتصال بقاعدة البيانات (خاصة عند استخدام الرابط الوهمي)
+    // P1001: Can't reach database server
+    if ((error as any)?.code === 'P1001') {
+      console.warn("Navbar: Database unreachable (likely using dummy connection). Navigation will be empty.")
+    } else {
+      console.error("Failed to fetch categories for navbar:", error)
+    }
   }
 
   return <Header categories={categories} />
