@@ -102,13 +102,18 @@ export default function Header({ categories }: HeaderProps) {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
-            <button className="p-2.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors">
+            <button 
+              className="p-2.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="بحث في الموقع"
+            >
               <Search className="w-5 h-5" />
             </button>
             
             <button 
               onClick={() => setIsOpen(!isOpen)}
               className="lg:hidden p-2.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label={isOpen ? "إغلاق القائمة الرئيسية" : "فتح القائمة الرئيسية"}
+              aria-expanded={isOpen}
             >
               {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
