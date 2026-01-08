@@ -4,7 +4,7 @@ import prisma from '@/lib/prisma';
 export const revalidate = 3600; // إعادة التحقق كل ساعة كحد أقصى، ولكن revalidatePath ستجبره على التحديث فوراً عند النشر
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://my-news-web-site.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
   // جلب كافة الأخبار المنشورة
   const posts = await prisma.post.findMany({

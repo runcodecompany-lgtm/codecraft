@@ -115,10 +115,29 @@ export async function createPost(data: CreatePostData) {
     revalidatePath("/sitemap.xml")
     revalidatePath(`/news/${data.slug}`)
     revalidatePath("/admin/posts")
+
+    // تنبيه جوجل بوجود تحديث في خريطة الموقع
+    pingGoogle();
+
     return { success: true }
   } catch (error) {
     console.error("Error creating post:", error)
     return { error: "حدث خطأ أثناء إضافة الخبر" }
+  }
+}
+
+// وظيفة لتنبيه جوجل بوجود تحديث في خريطة الموقع (SEO Ping)
+async function pingGoogle() {
+  const sitemapUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/sitemap.xml`;
+  try {
+    // رابط Google Ping لخرائط المواقع
+    await fetch(`https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`, {
+      method: 'GET',
+      mode: 'no-cors' // جوجل لا يسمح بـ CORS هنا ولكن الطلب سيصل
+    });
+    console.log("Google pinged successfully");
+  } catch (error) {
+    console.error("Error pinging Google:", error);
   }
 }
 
@@ -167,6 +186,10 @@ export async function updatePost(id: string, data: UpdatePostData) {
     revalidatePath("/sitemap.xml")
     revalidatePath(`/news/${data.slug}`)
     revalidatePath("/admin/posts")
+
+    // تنبيه جوجل بوجود تحديث في خريطة الموقع
+    pingGoogle();
+
     return { success: true }
   } catch (error) {
     console.error("Error updating post:", error)

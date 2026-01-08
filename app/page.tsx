@@ -1,77 +1,90 @@
 
 import Image from "next/image";
+import Link from "next/link";
+import prisma from "@/lib/prisma";
+import { formatDistanceToNow } from "date-fns";
+import { ar } from "date-fns/locale";
 
-// بيانات تجريبية لمحاكاة الأخبار
-const FEATURED_POSTS = [
-  {
-    id: 1,
-    title: "إنجاز تقني جديد: الذكاء الاصطناعي يغير مفهوم البرمجة في 2026",
-    excerpt: "دراسات حديثة تؤكد أن المبرمجين الذين يستخدمون أدوات الذكاء الاصطناعي تضاعفت إنتاجيتهم...",
-    image: "https://picsum.photos/800/500",
-    category: "تقنية",
-    date: "قبل ساعتين"
-  },
-  {
-    id: 2,
-    title: "انطلاق فعاليات مؤتمر الابتكار الرقمي في المنطقة",
-    excerpt: "يشهد المؤتمر مشاركة واسعة من كبرى الشركات العالمية لمناقشة مستقبل الويب..",
-    image: "https://picsum.photos/400/300",
-    category: "اقتصاد",
-    date: "قبل 5 ساعات"
-  },
-];
+export default async function Home() {
+  // جلب أحدث 10 أخبار من قاعدة البيانات
+  const latestPosts = await prisma.post.findMany({
+    where: { published: true },
+    take: 10,
+    orderBy: { createdAt: 'desc' },
+    include: { category: true }
+  });
 
-export default function Home() {
+  const featuredPost = latestPosts[0];
+  const sidePosts = latestPosts.slice(1, 4);
+  const gridPosts = latestPosts.slice(4);
+
   return (
     <main className="min-h-screen bg-gray-50 text-right" dir="rtl">
-      {/* Header - شريط التنقل */}
-      
-
       {/* Hero Section - الخبر الرئيسي */}
       <section className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* الخبر الكبير */}
-          <div className="lg:col-span-2 relative group cursor-pointer overflow-hidden rounded-xl bg-white shadow-md">
-            <Image 
-              src={FEATURED_POSTS[0].image} 
-              alt="Main News" 
-              width={800}
-              height={400}
-              className="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <div className="absolute bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent p-6">
-              <span className="bg-red-600 text-white px-3 py-1 rounded text-sm mb-2 inline-block">
-                {FEATURED_POSTS[0].category}
-              </span>
-              <h2 className="text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">
-                {FEATURED_POSTS[0].title}
-              </h2>
-              <p className="text-gray-200 line-clamp-2">{FEATURED_POSTS[0].excerpt}</p>
+          {featuredPost ? (
+            <Link 
+              href={`/news/${featuredPost.slug}`}
+              className="lg:col-span-2 relative group cursor-pointer overflow-hidden rounded-xl bg-white shadow-md"
+            >
+              <Image 
+                src={featuredPost.mainImage || "https://picsum.photos/800/500"} 
+                alt={featuredPost.title} 
+                width={800}
+                height={400}
+                className="w-full h-[400px] object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute bottom-0 right-0 left-0 bg-gradient-to-t from-black to-transparent p-6">
+                <span className="bg-red-600 text-white px-3 py-1 rounded text-sm mb-2 inline-block">
+                  {featuredPost.category?.name || "عام"}
+                </span>
+                <h2 className="text-2xl md:text-4xl font-bold text-white mb-2 leading-tight">
+                  {featuredPost.title}
+                </h2>
+                <p className="text-gray-200 line-clamp-2">{featuredPost.excerpt}</p>
+              </div>
+            </Link>
+          ) : (
+            <div className="lg:col-span-2 h-[400px] bg-gray-200 rounded-xl flex items-center justify-center text-gray-400">
+              لا توجد أخبار مميزة حالياً
             </div>
-          </div>
+          )}
 
           {/* الأخبار الجانبية */}
           <div className="flex flex-col gap-6">
-            <h3 className="text-xl font-bold border-r-4 border-red-600 pr-3">الأكثر قراءة</h3>
-            {[1, 2, 3].map((i: number) => (
-              <div key={i} className="flex gap-4 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+            <h3 className="text-xl font-bold border-r-4 border-red-600 pr-3">أحدث الأخبار</h3>
+            {sidePosts.map((post) => (
+              <Link 
+                key={post.id} 
+                href={`/news/${post.slug}`}
+                className="flex gap-4 bg-white p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+              >
                 <div className="w-24 h-24 flex-shrink-0 bg-gray-200 rounded-md overflow-hidden relative">
                   <Image 
-                    src={`https://picsum.photos/200/200?random=${i}`} 
-                    alt={`Side news ${i}`}
+                    src={post.mainImage || `https://picsum.photos/200/200`} 
+                    alt={post.title}
                     fill
                     className="object-cover" 
                   />
                 </div>
                 <div className="flex flex-col justify-between">
                   <h4 className="font-bold text-sm hover:text-red-600 cursor-pointer line-clamp-2">
-                    عنوان خبر جانبي سريع لملء المساحة وتجربة التصميم {i}
+                    {post.title}
                   </h4>
-                  <span className="text-xs text-gray-400">منذ {i} ساعات</span>
+                  <span className="text-xs text-gray-400">
+                    {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true, locale: ar })}
+                  </span>
                 </div>
-              </div>
+              </Link>
             ))}
+            {sidePosts.length === 0 && (
+              <div className="text-center py-10 text-gray-400 border border-dashed rounded-lg">
+                قريباً...
+              </div>
+            )}
           </div>
 
         </div>
@@ -81,23 +94,34 @@ export default function Home() {
       <section className="container mx-auto px-4 py-8">
         <h3 className="text-2xl font-bold mb-6 border-b-2 border-gray-200 pb-2">آخر الأخبار</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((item: number) => (
-            <div key={item} className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-100">
+          {gridPosts.map((post) => (
+            <Link 
+              key={post.id} 
+              href={`/news/${post.slug}`}
+              className="bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all border border-gray-100"
+            >
               <div className="h-48 bg-gray-200 relative">
                 <Image 
-                  src={`https://picsum.photos/400/300?random=${item + 10}`} 
-                  alt={`News item ${item}`}
+                  src={post.mainImage || `https://picsum.photos/400/300`} 
+                  alt={post.title}
                   fill
                   className="object-cover" 
                 />
               </div>
               <div className="p-4">
-                <span className="text-red-600 text-xs font-bold mb-2 block">منوعات</span>
-                <h4 className="font-bold mb-2 line-clamp-2">العنوان الإخباري هنا يظهر بهذا الشكل الجذاب والمنسق</h4>
-                <p className="text-sm text-gray-500 line-clamp-3">تفاصيل الخبر القصيرة تظهر هنا لتجذب القارئ للمتابعة وقراءة المزيد من التفاصيل...</p>
+                <span className="text-red-600 text-xs font-bold mb-2 block">
+                  {post.category?.name || "عام"}
+                </span>
+                <h4 className="font-bold mb-2 line-clamp-2">{post.title}</h4>
+                <p className="text-sm text-gray-500 line-clamp-3">{post.excerpt}</p>
               </div>
-            </div>
+            </Link>
           ))}
+          {gridPosts.length === 0 && sidePosts.length > 0 && (
+            <div className="col-span-full text-center py-20 text-gray-400">
+              تابعنا للمزيد من الأخبار قريباً
+            </div>
+          )}
         </div>
       </section>
     </main>
