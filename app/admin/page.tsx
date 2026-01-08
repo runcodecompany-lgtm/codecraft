@@ -1,20 +1,27 @@
 export const dynamic = 'force-dynamic';
 import prisma from '@/lib/prisma'
-import { FileText, Layers, TrendingUp, Calendar, ArrowRight } from 'lucide-react'
+import { FileText, Layers, Eye, Calendar, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { Post } from '@/types'
 
 export default async function AdminDashboard() {
   // جلب البيانات من Prisma
-  const [postsCount, categoriesCount, recentPosts] = await Promise.all([
+  const [postsCount, categoriesCount, totalViewsData, recentPosts] = await Promise.all([
     prisma.post.count(),
     prisma.category.count(),
+    prisma.post.aggregate({
+      _sum: {
+        views: true
+      }
+    }),
     prisma.post.findMany({
       take: 5,
       orderBy: { createdAt: 'desc' },
       include: { category: true }
     })
   ])
+
+  const totalViews = totalViewsData._sum.views || 0
 
   const stats = [
     {
@@ -31,8 +38,8 @@ export default async function AdminDashboard() {
     },
     {
       name: 'المشاهدات الإجمالية',
-      value: 'قريباً', // يمكن تطويرها لاحقاً
-      icon: TrendingUp,
+      value: totalViews.toLocaleString('ar-EG'),
+      icon: Eye,
       color: 'bg-green-500',
     },
   ]
@@ -49,14 +56,14 @@ export default async function AdminDashboard() {
         {stats.map((stat) => (
           <div 
             key={stat.name}
-            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center space-x-4 space-x-reverse"
+            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center gap-4"
           >
-            <div className={`${stat.color} p-4 rounded-lg text-white`}>
+            <div className={`${stat.color} p-4 rounded-lg text-white shrink-0`}>
               <stat.icon className="w-6 h-6" />
             </div>
-            <div>
+            <div className="flex flex-col">
               <p className="text-sm font-medium text-gray-500">{stat.name}</p>
-              <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+              <p className="text-2xl font-bold text-gray-900 leading-tight">{stat.value}</p>
             </div>
           </div>
         ))}

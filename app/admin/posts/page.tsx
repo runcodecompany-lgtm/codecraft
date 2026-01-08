@@ -30,6 +30,7 @@ export default async function PostsPage() {
             <tr>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">الخبر</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">القسم</th>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">المشاهدات</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600">تاريخ النشر</th>
               <th className="px-6 py-4 text-sm font-semibold text-gray-600 text-center">العمليات</th>
             </tr>
@@ -60,6 +61,12 @@ export default async function PostsPage() {
                   <span className="px-2 py-1 bg-blue-50 text-blue-600 text-xs rounded-full">
 {post.category?.name ?? 'بدون قسم'}
                   </span>
+                </td>
+                <td className="px-6 py-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-3 h-3 text-gray-400" />
+                    {(post.views || 0).toLocaleString('ar-EG')}
+                  </div>
                 </td>
                 <td className="px-6 py-4 text-sm text-gray-500">
                   {new Date(post.createdAt).toLocaleDateString('ar-EG')}

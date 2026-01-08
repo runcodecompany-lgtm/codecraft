@@ -7,6 +7,54 @@ import Link from '@tiptap/extension-link'
 import Underline from '@tiptap/extension-underline'
 import Placeholder from '@tiptap/extension-placeholder'
 import TextAlign from '@tiptap/extension-text-align'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { Extension } from '@tiptap/core'
+
+// امتداد مخصص للتحكم بحجم الخط
+const FontSize = Extension.create({
+  name: 'fontSize',
+  addOptions() {
+    return {
+      types: ['textStyle'],
+    }
+  },
+  addGlobalAttributes() {
+    return [
+      {
+        types: this.options.types,
+        attributes: {
+          fontSize: {
+            default: null,
+            parseHTML: element => element.style.fontSize.replace(/['"]+/g, ''),
+            renderHTML: attributes => {
+              if (!attributes.fontSize) {
+                return {}
+              }
+              return {
+                style: `font-size: ${attributes.fontSize}`,
+              }
+            },
+          },
+        },
+      },
+    ]
+  },
+  addCommands() {
+    return {
+      setFontSize: fontSize => ({ chain }) => {
+        return chain()
+          .setMark('textStyle', { fontSize })
+          .run()
+      },
+      unsetFontSize: () => ({ chain }) => {
+        return chain()
+          .setMark('textStyle', { fontSize: null })
+          .removeEmptyTextStyle()
+          .run()
+      },
+    }
+  },
+})
 import { 
   Bold, 
   Italic, 
@@ -14,6 +62,8 @@ import {
   Heading1, 
   Heading2, 
   Heading3,
+  Heading4,
+  Heading5,
   List, 
   ListOrdered, 
   Quote, 
@@ -159,6 +209,18 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
       isActive: editor.isActive('heading', { level: 3 }),
     },
     {
+      icon: <Heading4 className="w-4 h-4" />,
+      title: 'عنوان 4',
+      action: () => editor.chain().focus().toggleHeading({ level: 4 }).run(),
+      isActive: editor.isActive('heading', { level: 4 }),
+    },
+    {
+      icon: <Heading5 className="w-4 h-4" />,
+      title: 'عنوان 5',
+      action: () => editor.chain().focus().toggleHeading({ level: 5 }).run(),
+      isActive: editor.isActive('heading', { level: 5 }),
+    },
+    {
       icon: <List className="w-4 h-4" />,
       title: 'قائمة نقطية',
       action: () => editor.chain().focus().toggleBulletList().run(),
@@ -229,8 +291,50 @@ const MenuBar = ({ editor }: { editor: Editor }) => {
     },
   ]
 
+  const fontSizes = [
+    { label: '8', value: '8px' },
+    { label: '9', value: '9px' },
+    { label: '10', value: '10px' },
+    { label: '11', value: '11px' },
+    { label: '12', value: '12px' },
+    { label: '14', value: '14px' },
+    { label: '16', value: '16px' },
+    { label: '18', value: '18px' },
+    { label: '20', value: '20px' },
+    { label: '22', value: '22px' },
+    { label: '24', value: '24px' },
+    { label: '26', value: '26px' },
+    { label: '28', value: '28px' },
+    { label: '36', value: '36px' },
+    { label: '48', value: '48px' },
+    { label: '72', value: '72px' },
+  ]
+
   return (
     <div className="sticky top-0 z-10 flex flex-wrap gap-0.5 p-1.5 bg-gray-50 border-b border-gray-200 rounded-t-lg items-center">
+      {/* اختيار حجم الخط */}
+      <div className="flex items-center gap-1 px-2 border-l border-gray-300 ml-1">
+        <select 
+          className="bg-white border border-gray-200 rounded px-1 py-0.5 text-xs text-gray-600 outline-none cursor-pointer hover:border-blue-400 transition-colors min-w-[60px]"
+          onChange={(e) => {
+            const size = e.target.value
+            if (size === 'default') {
+              
+              editor.chain().focus().unsetFontSize().run()
+            } else {
+              
+              editor.chain().focus().setFontSize(size).run()
+            }
+          }}
+          value={editor.getAttributes('textStyle').fontSize || 'default'}
+        >
+          <option value="default">الحجم</option>
+          {fontSizes.map(size => (
+            <option key={size.value} value={size.value}>{size.label}</option>
+          ))}
+        </select>
+      </div>
+
       {buttons.map((btn, i) => (
         <button
           key={i}
@@ -361,10 +465,12 @@ export default function RichEditor({ content, onChange, placeholder = 'ابدأ 
     extensions: [
       StarterKit.configure({
         heading: {
-          levels: [1, 2, 3],
+          levels: [1, 2, 3, 4, 5],
         },
       }),
       Underline,
+      TextStyle,
+      FontSize,
       Link.configure({
         openOnClick: false,
         HTMLAttributes: {

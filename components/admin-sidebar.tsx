@@ -5,6 +5,7 @@ import {
   LayoutDashboard, 
   FileText, 
   Layers, 
+  Sparkles,
   LogOut, 
   Menu, 
   X 
@@ -16,6 +17,7 @@ import LinkComponent from 'next/link'
 const menuItems = [
   { name: 'الرئيسية', icon: LayoutDashboard, href: '/admin' },
   { name: 'الأخبار', icon: FileText, href: '/admin/posts' },
+  { name: 'مساعد السيو', icon: Sparkles, href: '/admin/seo-assistant' },
   { name: 'الأقسام', icon: Layers, href: '/admin/categories' },
 ]
 
