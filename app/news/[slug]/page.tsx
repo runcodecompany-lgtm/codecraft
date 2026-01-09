@@ -35,7 +35,7 @@ export async function generateMetadata(
 
     if (!post) return { title: "الخبر غير موجود" };
 
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://my-news-web-site.vercel.app';
 
     return {
       title: `${post.title}`,
