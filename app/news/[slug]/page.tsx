@@ -36,17 +36,37 @@ export async function generateMetadata(
     if (!post) return { title: "الخبر غير موجود" };
 
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://my-news-web-site.vercel.app';
+    
+    // تحسين العنوان ليكون مناسباً لـ SEO (أقصى طول إجمالي 70 حرفاً)
+    const siteSuffix = " | موقعنا الإخباري";
+    const maxTotalLength = 65; // نستخدم 65 للأمان
+    const maxTitleLength = maxTotalLength - siteSuffix.length;
+
+    let seoTitle: any;
+    if (post.title.length > maxTitleLength) {
+      // إذا كان العنوان طويلاً جداً، نستخدم العنوان المطلق (absolute) لمنع إضافة اسم الموقع مرتين أو تجاوزه الطول المسموح
+      seoTitle = {
+        absolute: post.title.length > maxTotalLength 
+          ? `${post.title.substring(0, maxTotalLength - 3)}...` 
+          : post.title
+      };
+    } else {
+      seoTitle = post.title;
+    }
+
+    // تنظيف الوصف من أي وسم HTML وتقصيره
+    const seoDescription = post.excerpt || post.content.replace(/<[^>]*>/g, '').substring(0, 160).trim();
 
     return {
-      title: `${post.title}`,
-      description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
+      title: seoTitle,
+      description: seoDescription,
       keywords: post.keywords?.join(', '),
       alternates: {
         canonical: `${baseUrl}/news/${post.slug}`,
       },
       openGraph: {
-        title: post.title,
-        description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
+        title: typeof seoTitle === 'string' ? seoTitle : seoTitle.absolute,
+        description: seoDescription,
         url: `${baseUrl}/news/${post.slug}`,
         siteName: 'موقع أخبارنا',
         locale: 'ar_SA',
@@ -59,8 +79,8 @@ export async function generateMetadata(
       },
       twitter: {
         card: 'summary_large_image',
-        title: post.title,
-        description: post.excerpt || post.content.substring(0, 160).replace(/<[^>]*>/g, ''),
+        title: typeof seoTitle === 'string' ? seoTitle : seoTitle.absolute,
+        description: seoDescription,
         images: post.mainImage ? [post.mainImage] : [],
       },
     };
