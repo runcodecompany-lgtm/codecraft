@@ -1,24 +1,32 @@
-export const dynamic = 'force-dynamic';
 import prisma from "@/lib/prisma"
 import Footer from "./footer"
 import { Category } from "@/types"
 
+export const dynamic = 'force-dynamic';
+
 export default async function SiteFooter() {
   // جلب التصنيفات من قاعدة البيانات لعرضها في الفوتر
   let categories: Category[] = []
+  let settings = null
+
   try {
-    categories = await prisma.category.findMany({
-      orderBy: {
-        name: 'asc'
-      }
-    })
+    // جلب التصنيفات والإعدادات في وقت واحد
+    const [categoriesRes, settingsRes] = await Promise.all([
+      prisma.category.findMany({
+        orderBy: {
+          name: 'asc'
+        }
+      }),
+      prisma.siteSettings.findUnique({
+        where: { id: 'default' }
+      })
+    ])
+    
+    categories = categoriesRes
+    settings = settingsRes
   } catch (error) {
-    if ((error as { code?: string })?.code === 'P1001') {
-      console.warn("Footer: Database unreachable (likely using dummy connection). Footer links will be empty.")
-    } else {
-      console.error("Failed to fetch categories for footer:", error)
-    }
+    console.error("Failed to fetch footer data:", error)
   }
 
-  return <Footer categories={categories} />
+  return <Footer categories={categories} settings={settings} />
 }

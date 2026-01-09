@@ -8,23 +8,51 @@ import {
   Sparkles,
   LogOut, 
   Menu, 
-  X 
+  X,
+  Users,
+  Settings
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import LinkComponent from 'next/link'
+import { Users as UsersIcon } from 'lucide-react'
 
 const menuItems = [
-  { name: 'الرئيسية', icon: LayoutDashboard, href: '/admin' },
-  { name: 'الأخبار', icon: FileText, href: '/admin/posts' },
-  { name: 'مساعد السيو', icon: Sparkles, href: '/admin/seo-assistant' },
-  { name: 'الأقسام', icon: Layers, href: '/admin/categories' },
+  { name: 'الرئيسية', icon: LayoutDashboard, href: '/admin', roles: ['ADMIN', 'WRITER'] },
+  { name: 'الأخبار', icon: FileText, href: '/admin/posts', roles: ['ADMIN', 'WRITER'] },
+  { name: 'الأعضاء', icon: Users, href: '/admin/users', roles: ['ADMIN'] },
+  { name: 'الأقسام', icon: Layers, href: '/admin/categories', roles: ['ADMIN'] },
+  { name: 'مساعد السيو', icon: Sparkles, href: '/admin/seo-assistant', roles: ['ADMIN', 'WRITER'] },
+  { name: 'الإعدادات', icon: Settings, href: '/admin/settings', roles: ['ADMIN'] },
 ]
 
 export default function AdminSidebar() {
   const pathname = usePathname()
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const [userRole, setUserRole] = useState<string | null>(null)
+
+  useEffect(() => {
+    async function getUserRole() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user?.email) {
+        try {
+          // جلب الدور من قاعدة بياناتنا عبر API سريع أو مباشرة إذا كان مكون خادم
+          const res = await fetch(`/api/users/role?email=${user.email}`)
+          const data = await res.json()
+          setUserRole(data.role)
+          
+          // إذا كان كاتب ويحاول دخول صفحة محظورة، وجهه للأخبار
+          if (data.role === 'WRITER' && (pathname === '/admin' || pathname === '/admin/categories' || pathname === '/admin/users')) {
+            router.push('/admin/posts')
+          }
+        } catch (err) {
+          console.error("Error fetching user role:", err)
+        }
+      }
+    }
+    getUserRole()
+  }, [pathname, router])
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
@@ -32,6 +60,11 @@ export default function AdminSidebar() {
   }
 
   const toggleSidebar = () => setIsOpen(!isOpen)
+
+  // تصفية القائمة بناءً على الدور
+  const filteredMenuItems = menuItems.filter(item => 
+    !userRole || item.roles.includes(userRole)
+  )
 
   return (
     <>
@@ -64,7 +97,7 @@ export default function AdminSidebar() {
 
           {/* Navigation Links */}
           <nav className="flex-1 p-4 space-y-2">
-            {menuItems.map((item) => {
+            {filteredMenuItems.map((item) => {
               const isActive = pathname === item.href
               return (
                 <LinkComponent

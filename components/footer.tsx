@@ -11,7 +11,8 @@ import {
   Phone, 
   MapPin, 
   ChevronLeft,
-  ArrowUpCircle
+  ArrowUpCircle,
+  MessageCircle
 } from 'lucide-react'
 
 interface Category {
@@ -20,11 +21,26 @@ interface Category {
   slug: string
 }
 
-interface FooterProps {
-  categories: Category[]
+interface SiteSettings {
+  facebook?: string
+  twitter?: string
+  instagram?: string
+  youtube?: string
+  whatsapp?: string
+  contactEmail?: string
+  phoneNumber?: string
+  officeAddress?: string
+  siteName: string
+  siteDescription?: string
+  footerCopyright?: string
 }
 
-export default function Footer({ categories }: FooterProps) {
+interface FooterProps {
+  categories: Category[]
+  settings?: SiteSettings | null
+}
+
+export default function Footer({ categories, settings }: FooterProps) {
   const currentYear = new Date().getFullYear()
 
   const scrollToTop = () => {
@@ -38,6 +54,15 @@ export default function Footer({ categories }: FooterProps) {
     { name: 'سياسة الخصوصية', href: '/privacy' },
   ]
 
+  // الروابط الافتراضية إذا لم تتوفر إعدادات
+  const socialLinks = [
+    { icon: Facebook, href: settings?.facebook, color: 'hover:bg-blue-600', label: 'فيسبوك' },
+    { icon: Twitter, href: settings?.twitter, color: 'hover:bg-gray-800', label: 'تويتر' },
+    { icon: Instagram, href: settings?.instagram, color: 'hover:bg-pink-600', label: 'انستجرام' },
+    { icon: Youtube, href: settings?.youtube, color: 'hover:bg-red-600', label: 'يوتيوب' },
+    { icon: MessageCircle, href: settings?.whatsapp, color: 'hover:bg-green-600', label: 'واتساب' },
+  ].filter(link => link.href) // عرض الأيقونات التي لها روابط فقط
+
   return (
     <footer className="bg-gray-900 text-gray-300 pt-16 pb-8" dir="rtl">
       <div className="container mx-auto px-4">
@@ -47,26 +72,35 @@ export default function Footer({ categories }: FooterProps) {
           <div className="space-y-6">
             <Link href="/" className="flex items-center gap-2 group">
               <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-                <span className="text-xl font-bold italic">N</span>
+                <span className="text-xl font-bold italic">{settings?.siteName?.charAt(0) || 'N'}</span>
               </div>
-              <span className="text-2xl font-black text-white tracking-tight">أخبار<span className="text-blue-500">نا</span></span>
+              <span className="text-2xl font-black text-white tracking-tight">
+                {settings?.siteName ? (
+                  <>
+                    {settings.siteName.slice(0, -2)}
+                    <span className="text-blue-500">{settings.siteName.slice(-2)}</span>
+                  </>
+                ) : (
+                  <>أخبار<span className="text-blue-500">نا</span></>
+                )}
+              </span>
             </Link>
             <p className="text-gray-400 leading-relaxed text-sm">
-              منصتكم الإخبارية الأولى للحصول على أحدث الأخبار والتحليلات العميقة في مختلف المجالات. نلتزم بالمصداقية والسرعة في نقل الخبر.
+              {settings?.siteDescription || 'منصتكم الإخبارية الأولى للحصول على أحدث الأخبار والتحليلات العميقة في مختلف المجالات. نلتزم بالمصداقية والسرعة في نقل الخبر.'}
             </p>
-            <div className="flex items-center gap-4">
-              <a href="https://my-news-web-site.vercel.app/" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-600 hover:text-white transition-all" aria-label="تابعنا على فيسبوك">
-                <Facebook className="w-5 h-5" />
-              </a>
-              <a href="https://my-news-web-site.vercel.app/" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-blue-400 hover:text-white transition-all" aria-label="تابعنا على منصة إكس">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="https://my-news-web-site.vercel.app/" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-pink-600 hover:text-white transition-all" aria-label="تواصل معنا عبر انستجرام">
-                <Instagram className="w-5 h-5" />
-              </a>
-              <a href="https://my-news-web-site.vercel.app/" className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-600 hover:text-white transition-all" aria-label="شاهد فيديوهاتنا على يوتيوب">
-                <Youtube className="w-5 h-5" />
-              </a>
+            <div className="flex items-center gap-3">
+              {socialLinks.map((link, idx) => (
+                <a 
+                  key={idx}
+                  href={link.href} 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center ${link.color} hover:text-white transition-all`} 
+                  aria-label={link.label}
+                >
+                  <link.icon className="w-5 h-5" />
+                </a>
+              ))}
             </div>
           </div>
 
@@ -125,7 +159,7 @@ export default function Footer({ categories }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-white text-sm font-medium">العنوان</p>
-                  <p className="text-gray-400 text-xs mt-1">شارع الصحافة، الطابق الرابع، الرياض، المملكة العربية السعودية</p>
+                  <p className="text-gray-400 text-xs mt-1">{settings?.officeAddress || 'الرياض، المملكة العربية السعودية'}</p>
                 </div>
               </li>
               <li className="flex items-start gap-4">
@@ -134,7 +168,7 @@ export default function Footer({ categories }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-white text-sm font-medium">البريد الإلكتروني</p>
-                  <p className="text-gray-400 text-xs mt-1">info@news-site.com</p>
+                  <p className="text-gray-400 text-xs mt-1">{settings?.contactEmail || 'info@news-site.com'}</p>
                 </div>
               </li>
               <li className="flex items-start gap-4">
@@ -143,7 +177,7 @@ export default function Footer({ categories }: FooterProps) {
                 </div>
                 <div>
                   <p className="text-white text-sm font-medium">رقم الهاتف</p>
-                  <p className="text-gray-400 text-xs mt-1" dir="ltr">+966 50 000 0000</p>
+                  <p className="text-gray-400 text-xs mt-1" dir="ltr">{settings?.phoneNumber || '+966 50 000 0000'}</p>
                 </div>
               </li>
             </ul>
@@ -154,7 +188,7 @@ export default function Footer({ categories }: FooterProps) {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-6">
           <p className="text-sm text-gray-500 text-center md:text-right">
-            جميع الحقوق محفوظة © {currentYear} <span className="text-blue-500 font-bold">أخبارنا</span>. صنع بكل حب لدعم المحتوى العربي.
+            {settings?.footerCopyright ? settings.footerCopyright.replace('{year}', currentYear.toString()) : `جميع الحقوق محفوظة © ${currentYear} أخبارنا. صنع بكل حب لدعم المحتوى العربي.`}
           </p>
           
           <button 

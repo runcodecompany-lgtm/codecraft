@@ -2,6 +2,7 @@
 
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import { createClient } from "@/utils/supabase/server"
 
 // --------------------
 // Category Actions
@@ -86,15 +87,45 @@ export async function createPost(data: CreatePostData) {
 
   try {
     // التأكد من وجود المستخدم في قاعدة البيانات المحلية (Prisma)
-    // إذا لم يكن موجوداً، نقوم بإنشائه (للمزامنة مع Supabase Auth)
-    await prisma.user.upsert({
-      where: { id: data.authorId },
-      update: {}, // لا نحدث شيئاً إذا كان موجوداً
-      create: {
-        id: data.authorId,
-        // يمكننا إضافة البريد الإلكتروني هنا إذا كان متوفراً في البيانات المرسلة
-      }
+    // إذا لم يكن موجوداً، نقوم بجلبه من Supabase ومزامنته
+    const existingUser = await prisma.user.findUnique({
+      where: { id: data.authorId }
     })
+
+    if (!existingUser) {
+      const supabase = await createClient()
+      const { data: { user: authUser } } = await supabase.auth.getUser()
+      
+      if (authUser && authUser.id === data.authorId) {
+        // استخراج البيانات من metadata
+        const username = authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user'
+        const email = authUser.email || ''
+        const alias = authUser.user_metadata?.alias || username
+        const role = (authUser.user_metadata?.role as any) || 'WRITER'
+
+        await prisma.user.create({
+          data: {
+            id: authUser.id,
+            username,
+            email,
+            alias,
+            role
+          }
+        })
+      } else {
+        // إذا لم نجد المستخدم في Supabase أيضاً (حالة نادرة جداً)
+        // نقوم بإنشاء مستخدم بسيط لتجنب فشل إنشاء الخبر
+        await prisma.user.create({
+          data: {
+            id: data.authorId,
+            username: `user_${data.authorId.substring(0, 8)}`,
+            email: `${data.authorId}@placeholder.com`,
+            alias: 'كاتب',
+            role: 'WRITER'
+          }
+        })
+      }
+    }
 
     await prisma.post.create({
       data: {
@@ -160,11 +191,31 @@ export async function updatePost(id: string, data: UpdatePostData) {
   try {
     // التأكد من وجود المستخدم (اختياري في التحديث ولكن مفيد للأمان)
     if (data.authorId) {
-      await prisma.user.upsert({
-        where: { id: data.authorId },
-        update: {},
-        create: { id: data.authorId }
+      const existingUser = await prisma.user.findUnique({
+        where: { id: data.authorId }
       })
+
+      if (!existingUser) {
+        const supabase = await createClient()
+        const { data: { user: authUser } } = await supabase.auth.getUser()
+        
+        if (authUser && authUser.id === data.authorId) {
+          const username = authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user'
+          const email = authUser.email || ''
+          const alias = authUser.user_metadata?.alias || username
+          const role = (authUser.user_metadata?.role as any) || 'WRITER'
+
+          await prisma.user.create({
+            data: {
+              id: authUser.id,
+              username,
+              email,
+              alias,
+              role
+            }
+          })
+        }
+      }
     }
 
     await prisma.post.update({

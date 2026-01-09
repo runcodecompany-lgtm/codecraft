@@ -29,12 +29,22 @@ model Post {
   @@index([slug])
 }
 
+enum Role {
+  ADMIN
+  WRITER
+}
+
 model User {
   id        String   @id @default(cuid())
-  name      String?
-  email     String?  @unique
+  username  String   @unique
+  alias     String?  // الاسم المستعار للجمهور
+  email     String   @unique
+  password  String?
+  image     String?  // رابط الصورة الشخصية
+  role      Role     @default(WRITER)
   posts     Post[]
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 
@@ -43,4 +53,26 @@ model Category {
   name  String @unique
   slug  String @unique
   posts Post[]
+}
+
+model SiteSettings {
+  id                  String   @id @default("default")
+  // روابط التواصل
+  facebook            String?
+  twitter             String?
+  instagram           String?
+  youtube             String?
+  whatsapp            String?
+  // بيانات التواصل
+  contactEmail        String?
+  phoneNumber         String?
+  officeAddress       String?
+  // بيانات الموقع العامة
+  siteName            String   @default("أخبارنا")
+  siteDescription     String?
+  footerCopyright     String?
+  // خرائط جوجل
+  googleMapsEmbedUrl  String?  @db.Text
+  
+  updatedAt           DateTime @updatedAt
 }

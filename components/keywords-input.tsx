@@ -14,16 +14,31 @@ export default function KeywordsInput({ keywords, onChange }: KeywordsInputProps
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' || e.key === ',') {
       e.preventDefault()
-      addKeyword()
+      addKeywords(inputValue)
     } else if (e.key === 'Backspace' && !inputValue && keywords.length > 0) {
       removeKeyword(keywords.length - 1)
     }
   }
 
-  const addKeyword = () => {
-    const trimmedValue = inputValue.trim().replace(/,$/, '')
-    if (trimmedValue && !keywords.includes(trimmedValue)) {
-      onChange([...keywords, trimmedValue])
+  const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault()
+    const pastedData = e.clipboardData.getData('text')
+    addKeywords(pastedData)
+  }
+
+  const addKeywords = (text: string) => {
+    if (!text.trim()) return
+
+    // تقسيم النص بناءً على الفواصل (العربية والإنجليزية)
+    const newKeywordsArray = text
+      .split(/[،,]/)
+      .map(word => word.trim())
+      .filter(word => word !== '' && !keywords.includes(word))
+
+    if (newKeywordsArray.length > 0) {
+      // إزالة التكرار من الكلمات الجديدة نفسها
+      const uniqueNewKeywords = [...new Set(newKeywordsArray)]
+      onChange([...keywords, ...uniqueNewKeywords])
       setInputValue('')
     } else {
       setInputValue('')
@@ -58,7 +73,8 @@ export default function KeywordsInput({ keywords, onChange }: KeywordsInputProps
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onBlur={addKeyword}
+          onPaste={handlePaste}
+          onBlur={() => addKeywords(inputValue)}
           placeholder={keywords.length === 0 ? "أضف كلمات مفتاحية (Enter أو فاصلة)..." : ""}
           className="flex-1 bg-transparent border-none outline-none text-sm min-w-[150px] py-1"
         />

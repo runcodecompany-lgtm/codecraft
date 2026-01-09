@@ -165,16 +165,49 @@ export default function SEOAssistantPage() {
 
               {/* الكلمات المفتاحية */}
               <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                <h3 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Hash className="w-4 h-4 text-blue-600" />
-                  الكلمات المفتاحية (Keywords)
-                </h3>
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <Hash className="w-4 h-4 text-blue-600" />
+                    الكلمات المفتاحية (Keywords)
+                  </h3>
+                  {result.keywords && result.keywords.length > 0 && (
+                    <button
+                      onClick={() => copyToClipboard(result.keywords.join(', '), "all_keywords", 0)}
+                      className="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg transition-colors"
+                    >
+                      {copiedIndex?.type === "all_keywords" ? (
+                        <>
+                          <Check className="w-3.5 h-3.5" />
+                          تم نسخ الكل
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5" />
+                          نسخ الكل
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                {/* عرض جماعي للكلمات المفتاحية */}
+                {result.keywords && result.keywords.length > 0 && (
+                  <div className="mb-4">
+                    <textarea
+                      readOnly
+                      className="w-full p-3 text-xs text-gray-600 bg-gray-50 border border-gray-100 rounded-xl focus:outline-none resize-none font-sans leading-relaxed"
+                      rows={3}
+                      value={result.keywords.join(', ')}
+                    />
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-2">
                   {result.keywords?.map((word, i) => (
                     <button
                       key={i}
                       onClick={() => copyToClipboard(word, "keyword", i)}
-                      className="group flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-blue-100 transition-colors"
+                      className="group flex items-center gap-2 bg-gray-50 text-gray-600 border border-gray-100 px-3 py-1.5 rounded-full text-xs font-medium hover:bg-blue-50 hover:text-blue-700 hover:border-blue-100 transition-colors"
                     >
                       {word}
                       {copiedIndex?.type === "keyword" && copiedIndex.index === i ? (

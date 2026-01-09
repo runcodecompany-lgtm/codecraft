@@ -1,128 +1,135 @@
 export const dynamic = 'force-dynamic';
 import { Mail, Phone, MapPin, Send, MessageSquare, Clock, Globe } from "lucide-react";
+import prisma from "@/lib/prisma";
 
 export const metadata = {
   title: "تواصل معنا | أخبارنا",
   description: "نحن هنا للاستماع إليك. تواصل معنا لأي استفسار أو اقتراح أو تعاون إخباري.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const settings = await prisma.siteSettings.findUnique({
+    where: { id: 'default' }
+  });
+
   return (
-    <div className="min-h-screen bg-gray-50" dir="rtl">
-      {/* Header */}
-      <header className="bg-white border-b relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600"></div>
-        <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-black text-gray-900 mb-6">يسعدنا التواصل معك</h1>
-          <p className="text-gray-600 text-xl max-w-2xl mx-auto leading-relaxed">
-            سواء كان لديك خبر، استفسار، أو ترغب في الانضمام لفريقنا، فنحن نرحب برسائلك دائماً.
+    <main className="min-h-screen bg-gray-50 py-16 lg:py-24" dir="rtl">
+      <div className="container mx-auto px-4">
+        {/* Header Section */}
+        <div className="max-w-3xl mx-auto text-center mb-16">
+          <h1 className="text-4xl lg:text-5xl font-black text-gray-900 mb-6">تواصل <span className="text-blue-600">معنا</span></h1>
+          <p className="text-gray-600 text-lg leading-relaxed">
+            نحن نقدر تواصلكم معنا. سواء كان لديكم خبر عاجل، استفسار إعلاني، أو اقتراح لتحسين تجربتكم، فريقنا جاهز للرد عليكم.
           </p>
         </div>
-      </header>
 
-      <main className="container mx-auto px-4 py-16">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
-            {/* Contact Info Cards */}
-            <div className="space-y-6">
-              <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 group hover:border-blue-200 transition-colors">
-                <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-all">
-                  <Mail className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">البريد الإلكتروني</h3>
-                <p className="text-gray-500 mb-4 text-sm">راسلنا في أي وقت وسنرد عليك خلال 24 ساعة.</p>
-                <a href="mailto:contact@yournews.com" className="text-blue-600 font-bold hover:underline">contact@yournews.com</a>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+          {/* Contact Info Cards */}
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-start gap-6 group hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all">
+                <Mail className="w-6 h-6" />
               </div>
-
-              <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 group hover:border-green-200 transition-colors">
-                <div className="w-12 h-12 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-green-600 group-hover:text-white transition-all">
-                  <Phone className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">اتصل بنا</h3>
-                <p className="text-gray-500 mb-4 text-sm">متاحون للرد على اتصالاتكم خلال ساعات العمل.</p>
-                <a href="tel:+966000000000" className="text-green-600 font-bold hover:underline" dir="ltr">+966 50 000 0000</a>
-              </div>
-
-              <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 group hover:border-purple-200 transition-colors">
-                <div className="w-12 h-12 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-purple-600 group-hover:text-white transition-all">
-                  <Clock className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">ساعات العمل</h3>
-                <p className="text-gray-500 text-sm">من الأحد إلى الخميس<br />9:00 صباحاً - 5:00 مساءً</p>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">البريد الإلكتروني</h3>
+                <p className="text-gray-500 text-sm mb-3">راسلنا في أي وقت وسنرد عليك خلال 24 ساعة.</p>
+                <a href={`mailto:${settings?.contactEmail || 'info@news-site.com'}`} className="text-blue-600 font-bold hover:underline">
+                  {settings?.contactEmail || 'info@news-site.com'}
+                </a>
               </div>
             </div>
 
-            {/* Contact Form */}
-            <div className="lg:col-span-2">
-              <div className="bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3 mb-10">
-                  <MessageSquare className="w-6 h-6 text-blue-600" />
-                  <h2 className="text-2xl font-bold text-gray-900">أرسل لنا رسالة</h2>
-                </div>
-
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 mr-1">الاسم الكامل</label>
-                      <input 
-                        type="text" 
-                        placeholder="أدخل اسمك الكريم"
-                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 outline-none transition-all"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700 mr-1">البريد الإلكتروني</label>
-                      <input 
-                        type="email" 
-                        placeholder="email@example.com"
-                        className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 outline-none transition-all"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 mr-1">الموضوع</label>
-                    <input 
-                      type="text" 
-                      placeholder="كيف يمكننا مساعدتك؟"
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 outline-none transition-all"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-bold text-gray-700 mr-1">الرسالة</label>
-                    <textarea 
-                      rows={5}
-                      placeholder="اكتب تفاصيل رسالتك هنا..."
-                      className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white focus:ring-4 focus:ring-blue-50 focus:border-blue-200 outline-none transition-all resize-none"
-                    ></textarea>
-                  </div>
-
-                  <button 
-                    type="submit"
-                    className="w-full md:w-auto bg-blue-600 text-white px-10 py-4 rounded-2xl font-bold hover:bg-blue-700 transition-all flex items-center justify-center gap-3 shadow-lg shadow-blue-900/10 group"
-                  >
-                    <span>إرسال الرسالة</span>
-                    <Send className="w-5 h-5 group-hover:translate-x-[-4px] group-hover:translate-y-[-2px] transition-transform" />
-                  </button>
-                </form>
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-start gap-6 group hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-2xl bg-green-50 flex items-center justify-center text-green-600 group-hover:bg-green-600 group-hover:text-white transition-all">
+                <Phone className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">رقم الهاتف</h3>
+                <p className="text-gray-500 text-sm mb-3">متاحون للرد على اتصالاتكم خلال ساعات العمل.</p>
+                <a href={`tel:${settings?.phoneNumber || '+966500000000'}`} dir="ltr" className="text-green-600 font-bold hover:underline inline-block">
+                  {settings?.phoneNumber || '+966 50 000 0000'}
+                </a>
               </div>
             </div>
 
+            <div className="bg-white p-8 rounded-3xl shadow-sm border border-gray-100 flex items-start gap-6 group hover:shadow-md transition-shadow">
+              <div className="w-14 h-14 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 group-hover:bg-orange-600 group-hover:text-white transition-all">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">المقر الرئيسي</h3>
+                <p className="text-gray-500 text-sm mb-3">تفضل بزيارتنا في مكتبنا الرسمي.</p>
+                <p className="text-gray-900 font-bold">
+                  {settings?.officeAddress || 'الرياض، المملكة العربية السعودية'}
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
-      </main>
 
-      {/* Map/Location Section */}
-      <section className="container mx-auto px-4 pb-16">
-        <div className="bg-white p-4 rounded-3xl shadow-sm border border-gray-100 h-96 relative overflow-hidden flex items-center justify-center">
-          <div className="text-center">
-            <MapPin className="w-12 h-12 text-gray-200 mx-auto mb-4" />
-            <p className="text-gray-400 font-medium">خريطة الموقع (قريباً)</p>
+          {/* Contact Form */}
+          <div className="lg:col-span-2 bg-white p-8 lg:p-12 rounded-3xl shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-bold text-gray-900 mb-8 flex items-center gap-3">
+              <MessageSquare className="w-6 h-6 text-blue-600" />
+              أرسل لنا رسالة
+            </h2>
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 mr-1">الاسم الكامل</label>
+                <input 
+                  type="text" 
+                  placeholder="أدخل اسمك هنا..."
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 mr-1">البريد الإلكتروني</label>
+                <input 
+                  type="email" 
+                  placeholder="email@example.com"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-sm font-bold text-gray-700 mr-1">الموضوع</label>
+                <input 
+                  type="text" 
+                  placeholder="ما الذي تود مراسلتنا بشأنه؟"
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                />
+              </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="text-sm font-bold text-gray-700 mr-1">الرسالة</label>
+                <textarea 
+                  rows={5}
+                  placeholder="اكتب رسالتك بالتفصيل هنا..."
+                  className="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all resize-none"
+                ></textarea>
+              </div>
+              <div className="md:col-span-2">
+                <button className="w-full md:w-auto px-10 py-4 bg-blue-600 text-white rounded-2xl font-black hover:bg-blue-700 transition-all shadow-lg shadow-blue-100 flex items-center justify-center gap-2">
+                  <Send className="w-5 h-5" />
+                  إرسال الرسالة الآن
+                </button>
+              </div>
+            </form>
           </div>
         </div>
-      </section>
-    </div>
+
+        {/* Map Section */}
+        {settings?.googleMapsEmbedUrl && (
+          <div className="mt-16 max-w-7xl mx-auto h-[450px] rounded-3xl overflow-hidden shadow-sm border border-gray-100">
+            <iframe 
+              src={settings.googleMapsEmbedUrl}
+              width="100%" 
+              height="100%" 
+              style={{ border: 0 }} 
+              allowFullScreen={true} 
+              loading="lazy" 
+              referrerPolicy="no-referrer-when-downgrade"
+            ></iframe>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
