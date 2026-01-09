@@ -35,7 +35,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "google-site-verification-id", // يجب استبداله بالمعرف الحقيقي لاحقاً
+    google: "google-google46d76b733011031b.html", // يجب استبداله بالمعرف الحقيقي لاحقاً
   },
 };
 

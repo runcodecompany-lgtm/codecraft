@@ -55,7 +55,7 @@ export default async function Home() {
 
           {/* الأخبار الجانبية */}
           <div className="flex flex-col gap-6">
-            <h3 className="text-xl font-bold border-r-4 border-red-600 pr-3">أحدث الأخبار</h3>
+            <h1 className="text-xl font-bold border-r-4 border-red-600 pr-3">أحدث الأخبار</h1>
             {sidePosts.map((post) => (
               <Link 
                 key={post.id} 
