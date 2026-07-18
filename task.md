@@ -1,0 +1,33 @@
+# Task Checklist: Phase 4 Teacher Ecosystem
+
+- [ ] Update database schema (`prisma/schema.prisma`)
+- [ ] Run `npx prisma db push` to apply schema changes
+- [ ] Create backend server actions:
+  - [ ] Course CRUD & Order (`actions/teacher-course.ts`)
+  - [ ] Lesson & Resources CRUD (`actions/teacher-lesson.ts`)
+  - [ ] Quiz Builder (`actions/teacher-quiz.ts`)
+  - [ ] Assignments Builder (`actions/teacher-assignment.ts`)
+  - [ ] Teacher Profile (`actions/teacher-profile.ts`)
+  - [ ] Reviews & Replies (`actions/review.ts`)
+- [ ] Create layout & navigation components:
+  - [ ] `components/teacher-sidebar.tsx`
+  - [ ] `app/dashboard/teacher/layout.tsx` (Guard authentication & role checking)
+- [ ] Create dashboards and pages:
+  - [ ] `app/dashboard/teacher/page.tsx` (Dashboard entry)
+  - [ ] `app/dashboard/teacher/courses/page.tsx` (Courses list)
+  - [ ] `app/dashboard/teacher/courses/new/page.tsx` (New Course creation)
+  - [ ] `app/dashboard/teacher/courses/[id]/page.tsx` (Course Detail & Module/Lesson structure editor)
+  - [ ] `app/dashboard/teacher/courses/[id]/lessons/[lessonId]/page.tsx` (Lesson editor & attachments)
+  - [ ] `app/dashboard/teacher/courses/[id]/quizzes/[quizId]/page.tsx` (Quiz builder & question bank integration)
+  - [ ] `app/dashboard/teacher/courses/[id]/assignments/[assignmentId]/page.tsx` (Assignment editor & grading)
+  - [ ] `app/dashboard/teacher/students/page.tsx` (Student tracking)
+  - [ ] `app/dashboard/teacher/reviews/page.tsx` (Reviews & ratings reply)
+  - [ ] `app/dashboard/teacher/profile/page.tsx` (Teacher Profile settings)
+  - [ ] `app/dashboard/teacher/analytics/page.tsx` (Analytics details)
+  - [ ] `app/dashboard/teacher/question-bank/page.tsx` (Question bank view)
+- [ ] Integrate & update public pages:
+  - [ ] `app/teachers/page.tsx` & `app/teachers/[id]/page.tsx` (Connect to DB TeacherProfile & Reviews rating)
+  - [ ] `app/courses/[slug]/page.tsx` (Display details, requirements, objectives, reviews)
+- [ ] Verification:
+  - [ ] Run TypeScript compilation check (`npx tsc --noEmit`)
+  - [ ] Build application (`npm run build`)

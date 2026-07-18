@@ -2,8 +2,8 @@
 export const dynamic = 'force-dynamic';
 import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { Menu, X, ChevronDown, Search, Home, Info, Phone, LayoutGrid } from 'lucide-react'
+import { usePathname, useRouter } from 'next/navigation'
+import { Menu, X, ChevronDown, Search, Home, Info, Phone, LayoutGrid, BookOpen, GraduationCap, Sparkles, ChevronRight, ChevronLeft } from 'lucide-react'
 
 interface Category {
   id: string
@@ -17,8 +17,21 @@ interface HeaderProps {
 
 export default function Header({ categories }: HeaderProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const [isScrolled, setIsScrolled] = useState(false)
+  const [isSearchFocused, setIsSearchFocused] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (searchQuery.trim()) {
+      router.push(`/search?q=${encodeURIComponent(searchQuery.trim())}`)
+      setIsSearchOpen(false)
+      setSearchQuery('')
+    }
+  }
 
   // تغيير ستايل الهيدر عند التمرير
   useEffect(() => {
@@ -102,12 +115,33 @@ export default function Header({ categories }: HeaderProps) {
 
           {/* Action Buttons */}
           <div className="flex items-center gap-2">
-            <button 
-              className="p-2.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
-              aria-label="بحث في الموقع"
-            >
-              <Search className="w-5 h-5" />
-            </button>
+            <div className={`relative flex items-center transition-all duration-300 ${isSearchOpen ? 'w-48 md:w-64' : 'w-10'}`}>
+              <form onSubmit={handleSearch} className="w-full flex items-center">
+                <input
+                  type="text"
+                  placeholder="ابحث عن خبر..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className={`w-full bg-gray-100 rounded-full py-2 pr-10 pl-4 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all ${
+                    isSearchOpen ? 'opacity-100 visible' : 'opacity-0 invisible'
+                  }`}
+                />
+                <button 
+                  type="button"
+                  onClick={() => {
+                    if (isSearchOpen && searchQuery.trim()) {
+                      handleSearch({ preventDefault: () => {} } as any)
+                    } else {
+                      setIsSearchOpen(!isSearchOpen)
+                    }
+                  }}
+                  className={`absolute right-0 p-2.5 text-gray-500 hover:bg-gray-100 rounded-full transition-colors ${isSearchOpen ? 'text-blue-600' : ''}`}
+                  aria-label="بحث في الموقع"
+                >
+                  <Search className="w-5 h-5" />
+                </button>
+              </form>
+            </div>
             
             <button 
               onClick={() => setIsOpen(!isOpen)}
@@ -127,7 +161,22 @@ export default function Header({ categories }: HeaderProps) {
           isOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
         }`}
       >
-        <div className="container mx-auto px-4 py-8 flex flex-col gap-6">
+        <div className="container mx-auto px-4 py-8 flex flex-col gap-6 overflow-y-auto max-h-[calc(100vh-72px)]">
+          {/* Mobile Search */}
+          <div className="px-2">
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                type="text"
+                placeholder="ابحث عن خبر..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-gray-50 border border-gray-100 rounded-2xl py-4 pr-12 pl-4 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              />
+              <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
+              <button type="submit" className="hidden">بحث</button>
+            </form>
+          </div>
+
           <div className="flex flex-col gap-2">
             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest px-4 mb-2">القائمة الرئيسية</p>
             {navLinks.map((link) => (

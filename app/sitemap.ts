@@ -1,41 +1,29 @@
-import { MetadataRoute } from 'next';
-import prisma from '@/lib/prisma';
+import { MetadataRoute } from 'next'
+import prisma from '@/lib/prisma'
 
-export const revalidate = 3600; // إعادة التحقق كل ساعة كحد أقصى، ولكن revalidatePath ستجبره على التحديث فوراً عند النشر
+export const revalidate = 3600
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://my-news-web-site.vercel.app';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://codecraftcore.com'
 
-  // جلب كافة الأخبار المنشورة
-  const posts = await prisma.post.findMany({
-    where: { published: true },
+  // جلب كافة الدورات المنشورة من المخطط الجديد
+  const courses = await prisma.course.findMany({
+    where: { isPublished: true },
     select: { slug: true, updatedAt: true },
-  });
+  })
 
-  // جلب كافة الأقسام
-  const categories = await prisma.category.findMany({
-    select: { slug: true },
-  });
-
-  const postUrls = posts.map((post) => ({
-    url: `${baseUrl}/news/${post.slug}`,
-    lastModified: post.updatedAt,
-    changeFrequency: 'daily' as const,
-    priority: 0.7,
-  }));
-
-  const categoryUrls = categories.map((category) => ({
-    url: `${baseUrl}/category/${category.slug}`,
-    lastModified: new Date(),
+  const courseUrls = courses.map((course) => ({
+    url: `${baseUrl}/courses/${course.slug}`,
+    lastModified: course.updatedAt,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
-  }));
+  }))
 
   const staticPages = [
     {
       url: baseUrl,
       lastModified: new Date(),
-      changeFrequency: 'hourly' as const,
+      changeFrequency: 'daily' as const,
       priority: 1,
     },
     {
@@ -51,12 +39,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.5,
     },
     {
+      url: `${baseUrl}/register`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/login`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.6,
+    },
+    {
       url: `${baseUrl}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'monthly' as const,
       priority: 0.3,
     },
-  ];
+  ]
 
-  return [...staticPages, ...categoryUrls, ...postUrls];
+  return [...staticPages, ...courseUrls]
 }

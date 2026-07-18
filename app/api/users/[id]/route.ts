@@ -1,97 +1,98 @@
-import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import bcrypt from 'bcrypt'
-import { supabaseAdmin } from '@/lib/supabase'
+import { NextResponse } from "next/server"
+import prisma from "@/lib/prisma"
+import { createClient } from "@/utils/supabase/server"
+import { supabaseAdmin } from "@/lib/supabase"
+import { UserRole } from "@prisma/client"
 
-// حذف مستخدم
+// DELETE: حذف مستخدم (Admin فقط)
 export async function DELETE(
-  request: Request,
-  { params }: { params: { id: string } }
+  _request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
 
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const caller = await prisma.user.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!caller || (caller.role !== "ADMIN" && caller.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     if (!supabaseAdmin) {
-      return NextResponse.json({ error: 'Supabase Admin Client not initialized' }, { status: 500 })
+      return NextResponse.json({ error: "Supabase Admin Client not initialized." }, { status: 500 })
     }
 
-    // 1. حذف من Supabase Auth
-    const { error: authError } = await supabaseAdmin.auth.admin.deleteUser(id)
-    if (authError) {
-      console.error('Supabase Auth Delete Error:', authError)
-      // نستمر في الحذف من Prisma حتى لو فشل Auth (ربما الحساب غير موجود أصلاً في Auth)
-    }
+    await supabaseAdmin.auth.admin.deleteUser(id)
+    await prisma.user.delete({ where: { id } })
 
-    // 2. حذف من Prisma
-    await prisma.user.delete({
-      where: { id },
-    })
-
-    return NextResponse.json({ message: 'User deleted successfully' })
+    return NextResponse.json({ message: "User deleted successfully" })
   } catch (error) {
-    console.error('Error deleting user:', error)
-    return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
+    console.error("Error deleting user:", error)
+    return NextResponse.json({ error: "Failed to delete user" }, { status: 500 })
   }
 }
 
-// تحديث بيانات مستخدم
+// PATCH: تحديث بيانات مستخدم (Admin فقط)
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params
-    const body = await request.json()
-    const { username, alias, email, password, role, image } = body
+
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const caller = await prisma.user.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!caller || (caller.role !== "ADMIN" && caller.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
 
     if (!supabaseAdmin) {
-      return NextResponse.json({ error: 'Supabase Admin Client not initialized' }, { status: 500 })
+      return NextResponse.json({ error: "Supabase Admin Client not initialized." }, { status: 500 })
     }
 
-    const data: any = {
-      username,
-      alias,
-      email,
-      role,
-      image,
+    const body = await request.json()
+    const { name, email, password, role } = body
+
+    const authUpdate: Record<string, string> = {}
+    if (email) authUpdate.email = email
+    if (password) authUpdate.password = password
+    if (Object.keys(authUpdate).length > 0) {
+      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, authUpdate)
+      if (authError) return NextResponse.json({ error: authError.message }, { status: 400 })
     }
 
-    // 1. تحديث في Supabase Auth إذا تغيرت كلمة المرور أو البريد
-    const authUpdateData: any = {}
-    if (password) authUpdateData.password = password
-    if (email) authUpdateData.email = email
-    
-    if (Object.keys(authUpdateData).length > 0) {
-      const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(id, authUpdateData)
-      if (authError) {
-        console.error('Supabase Auth Update Error:', authError)
-        return NextResponse.json({ error: authError.message }, { status: 400 })
+    const updateData: Record<string, unknown> = {}
+    if (name) updateData.name = name
+    if (email) updateData.email = email
+    if (role && Object.values(UserRole).includes(role)) {
+      if (role === "SUPER_ADMIN" && (caller.role as string) !== "SUPER_ADMIN") {
+        return NextResponse.json({ error: "Only Super Admin can assign the Super Admin role." }, { status: 403 })
       }
+      updateData.role = role as UserRole
     }
 
-    // 2. تشفير كلمة المرور لـ Prisma إذا تغيرت
-    if (password) {
-      data.password = await bcrypt.hash(password, 10)
-    }
-
-    // 3. تحديث في Prisma
-    const user = await prisma.user.update({
+    const updatedUser = await prisma.user.update({
       where: { id },
-      data,
+      data: updateData,
       select: {
         id: true,
-        username: true,
-        alias: true,
+        name: true,
         email: true,
         role: true,
-        image: true,
+        craftCoins: true,
         createdAt: true,
       },
     })
 
-    return NextResponse.json(user)
+    return NextResponse.json(updatedUser)
   } catch (error) {
-    console.error('Error updating user:', error)
-    return NextResponse.json({ error: 'Failed to update user' }, { status: 500 })
+    console.error("Error updating user:", error)
+    return NextResponse.json({ error: "Failed to update user" }, { status: 500 })
   }
 }

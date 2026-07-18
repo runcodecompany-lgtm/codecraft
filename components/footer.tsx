@@ -1,203 +1,265 @@
-'use client'
-export const dynamic = 'force-dynamic';
-import React from 'react'
-import Link from 'next/link'
-import { 
-  Facebook, 
-  Twitter, 
-  Instagram, 
-  Youtube, 
-  Mail, 
-  Phone, 
-  MapPin, 
+"use client"
+
+import React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import {
+  Github,
+  Twitter,
+  Linkedin,
+  Instagram,
+  Youtube,
+  Mail,
+  MapPin,
+  ArrowUp,
+  GraduationCap,
+  Sparkles,
+  BookOpen,
+  Users,
+  MessageCircle,
+  Shield,
+  Heart,
+  Map,
+  HelpCircle,
+  Newspaper,
+  Trophy,
+  Send,
   ChevronLeft,
-  ArrowUpCircle,
-  MessageCircle
-} from 'lucide-react'
+} from "lucide-react"
 
-interface Category {
-  id: string
-  name: string
-  slug: string
-}
+const exploreLinks = [
+  { name: "المسارات التعليمية",  href: "/courses/marketplace" },
+  { name: "سوق الدورات",         href: "/courses" },
+  { name: "المعلمون",            href: "/teachers" },
+  { name: "المجتمع",             href: "/community" },
+  { name: "المدونة التقنية",     href: "/articles" },
+  { name: "لوحة المتصدرين",     href: "/community/leaderboard" },
+]
 
-interface SiteSettings {
-  facebook?: string
-  twitter?: string
-  instagram?: string
-  youtube?: string
-  whatsapp?: string
-  contactEmail?: string
-  phoneNumber?: string
-  officeAddress?: string
-  siteName: string
-  siteDescription?: string
-  footerCopyright?: string
-}
+const supportLinks = [
+  { name: "من نحن",              href: "/about" },
+  { name: "مركز المساعدة",       href: "/help" },
+  { name: "تواصل معنا",          href: "/contact" },
+  { name: "سياسة الخصوصية",     href: "/privacy" },
+  { name: "الشروط والأحكام",     href: "/terms" },
+  { name: "الأسعار والباقات",   href: "/pricing" },
+]
 
-interface FooterProps {
-  categories: Category[]
-  settings?: SiteSettings | null
-}
+const socials = [
+  { icon: Github,    href: "https://github.com",    label: "GitHub" },
+  { icon: Twitter,   href: "https://twitter.com",   label: "Twitter" },
+  { icon: Linkedin,  href: "https://linkedin.com",  label: "LinkedIn" },
+  { icon: Instagram, href: "https://instagram.com", label: "Instagram" },
+  { icon: Youtube,   href: "https://youtube.com",   label: "YouTube" },
+]
 
-export default function Footer({ categories, settings }: FooterProps) {
-  const currentYear = new Date().getFullYear()
+export default function SiteFooter() {
+  const pathname = usePathname()
+  const year = new Date().getFullYear()
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" })
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const quickLinks = [
-    { name: 'الرئيسية', href: '/' },
-    { name: 'من نحن', href: '/about' },
-    { name: 'اتصل بنا', href: '/contact' },
-    { name: 'سياسة الخصوصية', href: '/privacy' },
-  ]
-
-  // الروابط الافتراضية إذا لم تتوفر إعدادات
-  const socialLinks = [
-    { icon: Facebook, href: settings?.facebook, color: 'hover:bg-blue-600', label: 'فيسبوك' },
-    { icon: Twitter, href: settings?.twitter, color: 'hover:bg-gray-800', label: 'تويتر' },
-    { icon: Instagram, href: settings?.instagram, color: 'hover:bg-pink-600', label: 'انستجرام' },
-    { icon: Youtube, href: settings?.youtube, color: 'hover:bg-red-600', label: 'يوتيوب' },
-    { icon: MessageCircle, href: settings?.whatsapp, color: 'hover:bg-green-600', label: 'واتساب' },
-  ].filter(link => link.href) // عرض الأيقونات التي لها روابط فقط
+  if (pathname?.startsWith("/register")) return null
 
   return (
-    <footer className="bg-gray-900 text-gray-300 pt-16 pb-8" dir="rtl">
-      <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          
-          {/* Brand Section */}
-          <div className="space-y-6">
-            <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg">
-                <span className="text-xl font-bold italic">{settings?.siteName?.charAt(0) || 'N'}</span>
+    <footer className="relative bg-[#F5F7FA] dark:bg-[#141C2F] text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800/60" dir="rtl">
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#2B4C7E]/30 to-transparent dark:via-[#2B4C7E]/50" />
+
+      <div className="border-b border-slate-200 dark:border-slate-800/60">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+              <h3 className="text-xl font-black text-slate-900 dark:text-slate-50 mb-1">
+                جاهز للانطلاق في مسيرتك التعليمية؟
+              </h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                ابدأ مجاناً اليوم وانضم لأكثر من مليون متعلم عربي.
+              </p>
+            </div>
+            <div className="flex items-center gap-3 shrink-0">
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-[#2B4C7E] to-[#1c3459] text-white font-bold text-sm hover:opacity-90 hover:scale-[1.03] transition-all shadow-lg shadow-[#2B4C7E]/20"
+              >
+                <Sparkles className="w-4 h-4" />
+                ابدأ مجاناً
+              </Link>
+              <Link
+                href="/courses/marketplace"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white font-bold text-sm transition-all"
+              >
+                <BookOpen className="w-4 h-4" />
+                استكشف الدورات
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-16 pb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
+
+          <div className="space-y-5">
+            <Link href="/" className="inline-flex items-center gap-2.5 group" aria-label="Code Craft Core">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-[#2B4C7E] to-[#1c3459] text-white shadow-md shadow-[#2B4C7E]/20 group-hover:scale-105 transition-all">
+                <GraduationCap className="h-5 w-5" />
               </div>
-              <span className="text-2xl font-black text-white tracking-tight">
-                {settings?.siteName ? (
-                  <>
-                    {settings.siteName.slice(0, -2)}
-                    <span className="text-blue-500">{settings.siteName.slice(-2)}</span>
-                  </>
-                ) : (
-                  <>أخبار<span className="text-blue-500">نا</span></>
-                )}
-              </span>
+              <div>
+                <p className="text-slate-900 dark:text-slate-50 font-black text-base tracking-tight">Code Craft Core</p>
+                <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">EdTech Platform</p>
+              </div>
             </Link>
-            <p className="text-gray-400 leading-relaxed text-sm">
-              {settings?.siteDescription || 'منصتكم الإخبارية الأولى للحصول على أحدث الأخبار والتحليلات العميقة في مختلف المجالات. نلتزم بالمصداقية والسرعة في نقل الخبر.'}
+
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">
+              منصة تعلّم عربية ذكية تدمج التعليم المنهجي بأساليب التعلم التكيّفي لصناعة الكفاءات العربية في عالم التقنية.
             </p>
-            <div className="flex items-center gap-3">
-              {socialLinks.map((link, idx) => (
-                <a 
-                  key={idx}
-                  href={link.href} 
+
+            <div className="space-y-2.5">
+              <a
+                href="mailto:support@codecraftcore.com"
+                className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-[#2B4C7E] dark:hover:text-[#7FA8D4] transition-colors group"
+              >
+                <Mail className="w-4 h-4 text-[#2B4C7E] dark:text-[#7FA8D4] shrink-0" />
+                <span>support@codecraftcore.com</span>
+              </a>
+              <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                <MapPin className="w-4 h-4 text-[#4A7C59] shrink-0" />
+                <span>المنطقة العربية · عالمي</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 flex-wrap">
+              {socials.map(({ icon: Icon, href, label }) => (
+                <a
+                  key={label}
+                  href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center ${link.color} hover:text-white transition-all`} 
-                  aria-label={link.label}
+                  aria-label={label}
+                  className="w-9 h-9 rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 flex items-center justify-center text-slate-500 dark:text-slate-400 hover:text-[#2B4C7E] dark:hover:text-[#7FA8D4] hover:border-[#2B4C7E]/30 dark:hover:border-[#2B4C7E]/40 hover:bg-[#2B4C7E]/5 hover:scale-105 transition-all"
                 >
-                  <link.icon className="w-5 h-5" />
+                  <Icon className="w-4 h-4" />
                 </a>
               ))}
             </div>
           </div>
 
-          {/* Categories Section */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              أقسام الأخبار
-            </h3>
-            <ul className="grid grid-cols-2 gap-y-4 gap-x-2">
-              {categories.slice(0, 8).map((cat) => (
-                <li key={cat.id}>
-                  <Link 
-                    href={`/category/${cat.slug}`}
-                    className="flex items-center gap-2 hover:text-blue-500 transition-colors text-sm group"
-                  >
-                    <ChevronLeft className="w-4 h-4 text-gray-600 group-hover:text-blue-500 transition-colors" />
-                    {cat.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Quick Links Section */}
-          <div>
-            <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+            <h3 className="text-slate-900 dark:text-slate-100 font-black text-sm mb-6 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#2B4C7E] dark:text-[#7FA8D4]" />
               روابط سريعة
             </h3>
-            <ul className="space-y-4">
-              {quickLinks.map((link) => (
-                <li key={link.href}>
-                  <Link 
-                    href={link.href}
-                    className="flex items-center gap-2 hover:text-blue-500 transition-colors text-sm group"
+            <ul className="space-y-3">
+              {exploreLinks.map(({ name, href }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="group flex items-center gap-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-[#2B4C7E] dark:hover:text-[#7FA8D4] transition-colors font-medium"
                   >
-                    <ChevronLeft className="w-4 h-4 text-gray-600 group-hover:text-blue-500 transition-colors" />
-                    {link.name}
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-[#2B4C7E] dark:group-hover:bg-[#7FA8D4] transition-colors shrink-0" />
+                    {name}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          {/* Contact Section */}
           <div>
-            <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
-              <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
-              تواصل معنا
+            <h3 className="text-slate-900 dark:text-slate-100 font-black text-sm mb-6 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#4A7C59]" />
+              المجتمع والدعم
             </h3>
-            <ul className="space-y-5">
-              <li className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-white text-sm font-medium">العنوان</p>
-                  <p className="text-gray-400 text-xs mt-1">{settings?.officeAddress || 'الرياض، المملكة العربية السعودية'}</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-white text-sm font-medium">البريد الإلكتروني</p>
-                  <p className="text-gray-400 text-xs mt-1">{settings?.contactEmail || 'info@news-site.com'}</p>
-                </div>
-              </li>
-              <li className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-xl bg-gray-800 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-blue-500" />
-                </div>
-                <div>
-                  <p className="text-white text-sm font-medium">رقم الهاتف</p>
-                  <p className="text-gray-400 text-xs mt-1" dir="ltr">{settings?.phoneNumber || '+966 50 000 0000'}</p>
-                </div>
-              </li>
+            <ul className="space-y-3">
+              {supportLinks.map(({ name, href }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="group flex items-center gap-2.5 text-sm text-slate-500 dark:text-slate-400 hover:text-[#4A7C59] dark:hover:text-[#6AAD7A] transition-colors font-medium"
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-slate-600 group-hover:bg-[#4A7C59] dark:group-hover:bg-[#6AAD7A] transition-colors shrink-0" />
+                    {name}
+                  </Link>
+                </li>
+              ))}
             </ul>
+          </div>
+
+          <div>
+            <h3 className="text-slate-900 dark:text-slate-100 font-black text-sm mb-6 flex items-center gap-2">
+              <MessageCircle className="w-4 h-4 text-[#2B4C7E] dark:text-[#7FA8D4]" />
+              ابقَ على اطلاع
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+              اشترك في نشرتنا البريدية للحصول على أحدث الدورات والمقالات والعروض.
+            </p>
+
+            <div className="flex gap-2">
+              <input
+                type="email"
+                id="footer-newsletter-email"
+                placeholder="بريدك الإلكتروني"
+                dir="rtl"
+                className="flex-1 min-w-0 bg-white dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm text-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-[#2B4C7E]/60 focus:ring-2 focus:ring-[#2B4C7E]/15 transition-all"
+              />
+              <button
+                aria-label="اشتراك في النشرة البريدية"
+                className="px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-[#2B4C7E] to-[#1c3459] text-white text-sm font-bold transition-all hover:opacity-90 hover:scale-[1.03] shadow-md shadow-[#2B4C7E]/20 shrink-0"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+            <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-2">
+              نحترم خصوصيتك. لا رسائل مزعجة أبداً.
+            </p>
+
+            <div className="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800 space-y-2.5">
+              <p className="text-[10px] uppercase font-black tracking-widest text-slate-400 dark:text-slate-500 mb-3">المجتمع</p>
+              <Link
+                href="/community"
+                className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-[#2B4C7E] dark:hover:text-[#7FA8D4] transition-colors font-semibold"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-[#2B4C7E] dark:text-[#7FA8D4]" />
+                منتدى المجتمع
+              </Link>
+              <Link
+                href="/community/questions"
+                className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-[#2B4C7E] dark:hover:text-[#7FA8D4] transition-colors font-semibold"
+              >
+                <Users className="w-3.5 h-3.5 text-[#2B4C7E] dark:text-[#7FA8D4]" />
+                الأسئلة والأجوبة
+              </Link>
+            </div>
           </div>
 
         </div>
 
-        {/* Bottom Bar */}
-        <div className="pt-8 border-t border-gray-800 flex flex-col md:flex-row items-center justify-between gap-6">
-          <p className="text-sm text-gray-500 text-center md:text-right">
-            {settings?.footerCopyright ? settings.footerCopyright.replace('{year}', currentYear.toString()) : `جميع الحقوق محفوظة © ${currentYear} أخبارنا. صنع بكل حب لدعم المحتوى العربي.`}
-          </p>
-          
-          <button 
-            onClick={scrollToTop}
-            className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-white transition-colors group"
-          >
-            العودة للأعلى
-            <ArrowUpCircle className="w-6 h-6 group-hover:-translate-y-1 transition-transform" />
-          </button>
+        <div className="pt-8 border-t border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 flex-wrap justify-center sm:justify-start">
+            <span>جميع الحقوق محفوظة ©</span>
+            <span className="text-slate-800 dark:text-slate-200 font-bold">{year} Code Craft Core</span>
+            <span className="hidden sm:inline">· صُنع بكل</span>
+            <Heart className="w-3.5 h-3.5 fill-rose-500 text-rose-500 hidden sm:inline-flex" />
+            <span className="hidden sm:inline">لمجتمعنا العربي</span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 text-xs text-slate-400 dark:text-slate-500">
+              <Link href="/privacy" className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors font-medium">الخصوصية</Link>
+              <span>·</span>
+              <Link href="/terms"   className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors font-medium">الشروط</Link>
+              <span>·</span>
+              <Link href="/sitemap.xml" className="hover:text-slate-600 dark:hover:text-slate-300 transition-colors font-medium">خريطة الموقع</Link>
+            </div>
+
+            <button
+              onClick={scrollToTop}
+              aria-label="العودة لأعلى الصفحة"
+              className="group flex items-center gap-1.5 text-xs font-bold text-slate-400 dark:text-slate-500 hover:text-[#2B4C7E] dark:hover:text-[#7FA8D4] transition-colors"
+            >
+              <span className="hidden sm:inline">أعلى الصفحة</span>
+              <ArrowUp className="w-4 h-4 group-hover:-translate-y-0.5 transition-transform" />
+            </button>
+          </div>
+
         </div>
       </div>
     </footer>

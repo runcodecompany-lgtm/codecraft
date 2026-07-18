@@ -1,135 +1,144 @@
 'use client'
-export const dynamic = 'force-dynamic';
-import { usePathname, useRouter } from 'next/navigation'
-import { 
-  LayoutDashboard, 
-  FileText, 
-  Layers, 
-  Sparkles,
-  LogOut, 
-  Menu, 
-  X,
-  Users,
-  Settings
-} from 'lucide-react'
-import { useState, useEffect } from 'react'
-import { supabase } from '@/lib/supabase'
-import LinkComponent from 'next/link'
-import { Users as UsersIcon } from 'lucide-react'
 
-const menuItems = [
-  { name: 'الرئيسية', icon: LayoutDashboard, href: '/admin', roles: ['ADMIN', 'WRITER'] },
-  { name: 'الأخبار', icon: FileText, href: '/admin/posts', roles: ['ADMIN', 'WRITER'] },
-  { name: 'الأعضاء', icon: Users, href: '/admin/users', roles: ['ADMIN'] },
-  { name: 'الأقسام', icon: Layers, href: '/admin/categories', roles: ['ADMIN'] },
-  { name: 'مساعد السيو', icon: Sparkles, href: '/admin/seo-assistant', roles: ['ADMIN', 'WRITER'] },
-  { name: 'الإعدادات', icon: Settings, href: '/admin/settings', roles: ['ADMIN'] },
-]
+import React from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import {
+  LayoutDashboard,
+  Users,
+  BookOpen,
+  FileText,
+  HelpCircle,
+  Gamepad2,
+  Award,
+  Bell,
+  Star,
+  BarChart3,
+  Shield,
+  Settings,
+  Coins,
+  Activity,
+  MessageSquare,
+  Image,
+  FolderOpen,
+  UserCheck,
+  ShieldAlert,
+  MessagesSquare,
+  Network,
+  Brain
+} from "lucide-react"
 
 export default function AdminSidebar() {
   const pathname = usePathname()
-  const router = useRouter()
-  const [isOpen, setIsOpen] = useState(false)
-  const [userRole, setUserRole] = useState<string | null>(null)
 
-  useEffect(() => {
-    async function getUserRole() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user?.email) {
-        try {
-          // جلب الدور من قاعدة بياناتنا عبر API سريع أو مباشرة إذا كان مكون خادم
-          const res = await fetch(`/api/users/role?email=${user.email}`)
-          const data = await res.json()
-          setUserRole(data.role)
-          
-          // إذا كان كاتب ويحاول دخول صفحة محظورة، وجهه للأخبار
-          if (data.role === 'WRITER' && (pathname === '/admin' || pathname === '/admin/categories' || pathname === '/admin/users')) {
-            router.push('/admin/posts')
-          }
-        } catch (err) {
-          console.error("Error fetching user role:", err)
-        }
-      }
-    }
-    getUserRole()
-  }, [pathname, router])
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.push('/login')
-  }
-
-  const toggleSidebar = () => setIsOpen(!isOpen)
-
-  // تصفية القائمة بناءً على الدور
-  const filteredMenuItems = menuItems.filter(item => 
-    !userRole || item.roles.includes(userRole)
-  )
+  const menuGroups = [
+    {
+      title: "الرئيسية",
+      items: [
+        { name: "لوحة التحكم", href: "/dashboard/admin", icon: LayoutDashboard },
+      ]
+    },
+    {
+      title: "إدارة المستخدمين",
+      items: [
+        { name: "جميع المستخدمين", href: "/dashboard/admin/users", icon: Users },
+        { name: "المعلمون", href: "/dashboard/admin/teachers", icon: UserCheck },
+        { name: "طلبات اعتماد المعلمين", href: "/dashboard/admin/teacher-applications", icon: FileText },
+        { name: "الأدوار والصلاحيات", href: "/dashboard/admin/roles", icon: Shield },
+      ]
+    },
+    {
+      title: "إدارة المحتوى",
+      items: [
+        { name: "المسارات التعليمية", href: "/dashboard/admin/tracks", icon: Network },
+        { name: "الدورات", href: "/dashboard/admin/courses", icon: BookOpen },
+        { name: "المقالات", href: "/dashboard/admin/articles", icon: FileText },
+        { name: "أقسام المنتدى", href: "/dashboard/admin/forums", icon: MessagesSquare },
+        { name: "الملفات والوسائط", href: "/dashboard/admin/media", icon: Image },
+      ]
+    },
+    {
+      title: "إدارة التقييم",
+      items: [
+        { name: "الاختبارات", href: "/dashboard/admin/quizzes", icon: HelpCircle },
+        { name: "الألعاب", href: "/dashboard/admin/games", icon: Gamepad2 },
+        { name: "الشهادات", href: "/dashboard/admin/certificates", icon: Award },
+        { name: "الإنجازات", href: "/dashboard/admin/achievements", icon: Star },
+      ]
+    },
+    {
+      title: "الذكاء الاصطناعي",
+      items: [
+        { name: "تحليلات AI والمراقبة", href: "/dashboard/admin/ai-analytics", icon: Brain },
+      ]
+    },
+    {
+      title: "الإدارة المالية",
+      items: [
+        { name: "المدفوعات والاشتراكات", href: "/dashboard/admin/financials", icon: Coins },
+      ]
+    },
+    {
+      title: "النظام والتحكم",
+      items: [
+        { name: "العملات و XP", href: "/dashboard/admin/coins", icon: Coins },
+        { name: "الإشعارات", href: "/dashboard/admin/notifications", icon: Bell },
+        { name: "البلاغات", href: "/dashboard/admin/reports", icon: Activity },
+        { name: "التعليقات", href: "/dashboard/admin/comments", icon: MessageSquare },
+        { name: "سجل التدقيق", href: "/dashboard/admin/audit-logs", icon: FolderOpen },
+      ]
+    },
+    {
+      title: "الإعدادات",
+      items: [
+        { name: "التحليلات", href: "/dashboard/admin/analytics", icon: BarChart3 },
+        { name: "مراقبة الأمان", href: "/dashboard/admin/security", icon: ShieldAlert },
+        { name: "إعدادات المنصة", href: "/dashboard/admin/settings", icon: Settings },
+      ]
+    },
+  ]
 
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <button 
-        onClick={toggleSidebar}
-        className="lg:hidden fixed top-4 right-4 z-50 p-2 bg-white rounded-md shadow-md"
-      >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-      </button>
+    <aside className="w-full md:w-72 flex-shrink-0 border-l border-gray-200/80 bg-white dark:border-slate-800/80 dark:bg-slate-950 md:min-h-[calc(100vh-4rem)] overflow-y-auto transition-all">
+      <div className="p-6">
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-400/20 text-rose-600 dark:text-rose-400 text-[10px] font-bold mb-2">
+          <ShieldAlert className="h-3 w-3" />
+          <span>لوحة الإدارة</span>
+        </div>
+        <p className="text-xs font-bold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+          Code Craft Core
+        </p>
+      </div>
 
-      {/* Sidebar Overlay for Mobile */}
-      {isOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black/50 z-40"
-          onClick={toggleSidebar}
-        />
-      )}
+      <nav className="px-4 pb-6 space-y-6">
+        {menuGroups.map((group) => (
+          <div key={group.title} className="space-y-1">
+            <p className="px-4 text-[10px] font-bold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+              {group.title}
+            </p>
+            {group.items.map((item) => {
+              const Icon = item.icon
+              const isActive = item.href === "/dashboard/admin"
+                ? pathname === item.href
+                : pathname.startsWith(item.href)
 
-      {/* Sidebar Content */}
-      <aside className={`
-        fixed top-0 right-0 bottom-0 z-40 w-64 bg-white border-l border-gray-200 transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
-      `} dir="rtl">
-        <div className="flex flex-col h-full">
-          {/* Logo / Title */}
-          <div className="p-6 border-b border-gray-100">
-            <h1 className="text-xl font-bold text-gray-800">لوحة التحكم</h1>
-          </div>
-
-          {/* Navigation Links */}
-          <nav className="flex-1 p-4 space-y-2">
-            {filteredMenuItems.map((item) => {
-              const isActive = pathname === item.href
               return (
-                <LinkComponent
+                <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`
-                    flex items-center space-x-3 space-x-reverse px-4 py-3 rounded-lg transition-colors
-                    ${isActive 
-                      ? 'bg-blue-50 text-blue-600' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}
-                  `}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${isActive
+                    ? "bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400"
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-slate-400 dark:hover:bg-slate-900/60 dark:hover:text-slate-200"
+                    }`}
                 >
-                  <item.icon className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`} />
-                  <span className="font-medium">{item.name}</span>
-                </LinkComponent>
+                  <Icon className={`h-4.5 w-4.5 ${isActive ? "text-rose-600 dark:text-rose-400" : "text-gray-500 dark:text-slate-400"}`} />
+                  <span>{item.name}</span>
+                </Link>
               )
             })}
-          </nav>
-
-          {/* Logout Button */}
-          <div className="p-4 border-t border-gray-100">
-            <button
-              onClick={handleLogout}
-              className="flex items-center space-x-3 space-x-reverse w-full px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors"
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">تسجيل الخروج</span>
-            </button>
           </div>
-        </div>
-      </aside>
-    </>
+        ))}
+      </nav>
+    </aside>
   )
 }

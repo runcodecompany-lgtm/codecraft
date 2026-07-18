@@ -1,101 +1,109 @@
-import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import bcrypt from 'bcrypt'
-import { supabaseAdmin } from '@/lib/supabase'
+import { NextResponse } from "next/server"
+import prisma from "@/lib/prisma"
+import { createClient } from "@/utils/supabase/server"
+import { supabaseAdmin } from "@/lib/supabase"
+import { UserRole } from "@prisma/client"
+import { randomBytes } from "crypto"
 
-// جلب جميع المستخدمين
+function generateReferralCode(): string {
+  return randomBytes(5).toString("hex").toUpperCase()
+}
+
+// GET: جلب جميع المستخدمين (Admin فقط)
 export async function GET() {
   try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+    const caller = await prisma.user.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (!caller || (caller.role !== "ADMIN" && caller.role !== "SUPER_ADMIN")) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 })
+    }
+
     const users = await prisma.user.findMany({
       select: {
         id: true,
-        username: true,
-        alias: true,
+        name: true,
         email: true,
         role: true,
-        image: true,
+        craftCoins: true,
+        streakCount: true,
         createdAt: true,
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { createdAt: "desc" },
     })
     return NextResponse.json(users)
   } catch (error) {
-    console.error('Error fetching users:', error)
-    return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })
+    console.error("Error fetching users:", error)
+    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
   }
 }
 
-// إنشاء مستخدم جديد
+// POST: إنشاء مستخدم جديد (Admin فقط)
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
-    const { username, alias, email, password, role, image } = body
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-    if (!username || !email || !password || !role) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
+    const caller = await prisma.user.findUnique({ where: { id: user.id }, select: { role: true } })
+    if (caller?.role !== "ADMIN") return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 
     if (!supabaseAdmin) {
-      return NextResponse.json({ error: 'Supabase Admin Client not initialized. Please add SUPABASE_SERVICE_ROLE_KEY to .env' }, { status: 500 })
+      return NextResponse.json(
+        { error: "Supabase Admin Client not initialized. Please add SUPABASE_SERVICE_ROLE_KEY." },
+        { status: 500 }
+      )
     }
 
-    // 1. التحقق من وجود المستخدم مسبقاً في Prisma
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [
-          { username },
-          { email }
-        ]
-      }
-    })
+    const body = await request.json()
+    const { name, email, password, role } = body
 
-    if (existingUser) {
-      return NextResponse.json({ error: 'Username or Email already exists' }, { status: 400 })
+    if (!name || !email || !password || !role) {
+      return NextResponse.json({ error: "Missing required fields: name, email, password, role" }, { status: 400 })
     }
 
-    // 2. إنشاء الحساب في Supabase Auth
-    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.createUser({
+    if (!Object.values(UserRole).includes(role)) {
+      return NextResponse.json({ error: `Invalid role. Must be one of: ${Object.values(UserRole).join(", ")}` }, { status: 400 })
+    }
+
+    if (role === "SUPER_ADMIN" && (caller.role as string) !== "SUPER_ADMIN") {
+      return NextResponse.json({ error: "Only Super Admin can assign the Super Admin role." }, { status: 403 })
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) return NextResponse.json({ error: "Email already exists" }, { status: 400 })
+
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true, // تأكيد البريد تلقائياً ليتمكن من الدخول فوراً
-      user_metadata: { username, alias, role }
+      email_confirm: true,
+      user_metadata: { name, role },
     })
 
-    if (authError) {
-      console.error('Supabase Auth Error:', authError)
-      return NextResponse.json({ error: authError.message }, { status: 400 })
-    }
+    if (authError) return NextResponse.json({ error: authError.message }, { status: 400 })
 
-    // 3. تشفير كلمة المرور لقاعدة بيانات Prisma
-    const hashedPassword = await bcrypt.hash(password, 10)
-
-    // 4. حفظ البيانات في Prisma
-    const user = await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
-        id: authUser.user.id, // نستخدم نفس الـ ID من Supabase لضمان التطابق
-        username,
-        alias,
+        id: authData.user.id,
+        name,
         email,
-        password: hashedPassword,
-        role,
-        image,
+        role: role as UserRole,
+        referralCode: generateReferralCode(),
       },
       select: {
         id: true,
-        username: true,
-        alias: true,
+        name: true,
         email: true,
         role: true,
-        image: true,
         createdAt: true,
       },
     })
 
-    return NextResponse.json(user, { status: 201 })
+    return NextResponse.json(newUser, { status: 201 })
   } catch (error) {
-    console.error('Error creating user:', error)
-    return NextResponse.json({ error: 'Failed to create user' }, { status: 500 })
+    console.error("Error creating user:", error)
+    return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
   }
 }

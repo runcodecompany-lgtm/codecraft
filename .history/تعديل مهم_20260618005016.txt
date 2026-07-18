@@ -1,0 +1,615 @@
+IMPORTANT
+
+The project is currently completed up to Phase 7.
+
+Before starting Phase 8 (AI Systems), we must implement a critical platform-wide foundation phase.
+
+This phase is NOT optional.
+
+Do NOT start implementing any AI, Subscription, Billing, Monetization, or Payment functionality.
+
+Your task is to review the entire project and implement a complete Identity, Access Control, Registration, Approval, and Governance system.
+
+This phase must be production-ready.
+
+Do not provide only a report.
+
+Implement the required changes.
+
+---
+
+PHASE 7.5
+
+Identity, Access & Governance System
+
+---
+
+Goal
+
+Transform the platform from a basic account system into a complete production-grade educational platform identity and access management architecture.
+
+The platform must properly support:
+
+- Guests
+- Students
+- Teachers
+- Moderators
+- Admins
+- Super Admins
+
+With proper permissions, workflows, approvals, security, and account lifecycle management.
+
+---
+
+STEP 1
+
+FULL PROJECT AUDIT
+
+Before changing anything:
+
+Review:
+
+- Database
+- Prisma Schema
+- Authentication
+- Authorization
+- Middleware
+- API Routes
+- Dashboards
+- Student Systems
+- Teacher Systems
+- Admin Systems
+- Community Systems
+- Registration Flows
+- Existing User Models
+
+Identify:
+
+- Missing access controls
+- Missing role restrictions
+- Missing approval workflows
+- Missing verification systems
+- Missing security layers
+
+Then implement fixes.
+
+---
+
+1. Guest Access System
+
+Implement a complete Guest vs Authenticated User experience.
+
+Guests must be able to:
+
+- View Landing Page
+- View Courses
+- View Learning Tracks
+- View Teachers
+- View Community Discussions
+- View Questions & Answers
+- View Public Profiles
+- Search Content
+
+Guests must NOT be able to:
+
+- Enroll in Courses
+- Join Learning Tracks
+- Participate in Community
+- Create Posts
+- Create Questions
+- Create Replies
+- Create Comments
+- React to Content
+- Access Student Dashboard
+- Access Teacher Dashboard
+- Access Private Features
+- Download Certificates
+
+When a guest attempts any restricted action:
+
+Show login/signup flow.
+
+Never allow unauthorized actions.
+
+---
+
+2. Role Based Access Control (RBAC)
+
+Review entire project.
+
+Implement proper RBAC.
+
+Required roles:
+
+Guest
+
+Student
+
+Teacher Pending
+
+Teacher Approved
+
+Moderator
+
+Admin
+
+Super Admin
+
+Every page, API, action, and dashboard must respect permissions.
+
+---
+
+3. Registration Architecture
+
+Review registration flow.
+
+Redesign if necessary.
+
+Required flow:
+
+Register
+↓
+Choose Account Type
+↓
+Complete Role-Specific Form
+↓
+Verify Email
+↓
+Account Creation
+↓
+Continue Onboarding
+
+---
+
+4. Student Registration
+
+Student registration form must support:
+
+- Full Name
+- Email
+- Password
+- Country
+- Primary Track
+- Secondary Tracks
+
+After registration:
+
+Proceed to placement testing flow.
+
+---
+
+5. Teacher Registration
+
+Teacher registration must be completely separate.
+
+Required fields:
+
+- Full Name
+- Email
+- Password
+- Country
+- Specialization
+- Biography
+- Skills
+- Years of Experience
+- LinkedIn
+- Portfolio Website
+- CV Upload
+
+Teacher account status after creation:
+
+Teacher Pending
+
+NOT Approved
+
+---
+
+6. Teacher Approval Workflow
+
+Teachers must NOT gain teaching privileges immediately.
+
+Required workflow:
+
+Teacher Registers
+↓
+Pending Review
+↓
+Admin Review
+↓
+Approved / Rejected / Request Changes
+↓
+Teacher Access Granted
+
+---
+
+Required statuses:
+
+Pending
+
+Approved
+
+Rejected
+
+Suspended
+
+---
+
+7. Teacher Restrictions
+
+Teacher Pending accounts must NOT:
+
+- Create Courses
+- Publish Courses
+- Create Exams
+- Publish Content
+- Appear Publicly In Teacher Directory
+
+Teacher Pending accounts may:
+
+- Edit Profile
+- Upload Documents
+- View Application Status
+
+---
+
+8. Teacher Applications Management
+
+Create admin management system.
+
+Admin must be able to:
+
+- Review Teacher Applications
+- View Submitted Documents
+- Approve
+- Reject
+- Request Changes
+
+Provide filtering and search.
+
+---
+
+9. Email Verification
+
+Implement full email verification.
+
+Required flow:
+
+Register
+↓
+Verification Email Sent
+↓
+Email Verification
+↓
+Account Activation
+
+Unverified users should have restricted access.
+
+---
+
+10. Password Recovery
+
+Implement complete password recovery.
+
+Required:
+
+- Forgot Password
+- Reset Password
+- Password Update
+- Secure Token Expiration
+
+---
+
+11. Profile Completion System
+
+Implement profile completion tracking.
+
+Examples:
+
+Profile 20%
+
+Profile 60%
+
+Profile 100%
+
+Support different completion logic for:
+
+- Students
+- Teachers
+
+---
+
+12. Teacher Readiness Validation
+
+Before a teacher can submit for approval:
+
+Validate:
+
+- Required Fields
+- Biography
+- Specialization
+- Skills
+- Uploaded Documents
+
+Prevent incomplete applications.
+
+---
+
+13. Approval Framework
+
+Design reusable approval architecture.
+
+The system should later support:
+
+- Teacher Approval
+- Course Approval
+- Content Approval
+
+Build reusable architecture now.
+
+Do not hardcode approval logic.
+
+---
+
+14. Core Notifications
+
+Implement system notifications.
+
+Required events:
+
+- Account Created
+- Email Verified
+- Password Changed
+- Teacher Submitted
+- Teacher Approved
+- Teacher Rejected
+- Teacher Suspended
+
+Integrate with existing notification system if present.
+
+---
+
+15. Activity Logging
+
+Create audit logging system.
+
+Track:
+
+- Registration
+- Login
+- Logout
+- Password Changes
+- Email Verification
+- Teacher Application Submission
+- Teacher Approval Actions
+
+Store timestamps and actors.
+
+---
+
+16. Security Hardening
+
+Review authentication security.
+
+Verify:
+
+- Password Hashing
+- Session Security
+- JWT Security
+- CSRF Protection
+- Rate Limiting
+- Brute Force Protection
+
+Implement missing protections.
+
+---
+
+17. Middleware Review
+
+Review all middleware.
+
+Protect:
+
+- Dashboards
+- Admin Pages
+- Teacher Pages
+- APIs
+
+Prevent unauthorized access.
+
+---
+
+18. Dashboard Routing
+
+Verify routing logic.
+
+Guests:
+
+No Dashboard Access
+
+Students:
+
+Student Dashboard
+
+Teacher Pending:
+
+Pending Teacher Dashboard
+
+Teacher Approved:
+
+Teacher Dashboard
+
+Admins:
+
+Admin Dashboard
+
+Super Admins:
+
+Super Admin Dashboard
+
+---
+
+19. Public Teacher Directory
+
+Only Approved Teachers may appear.
+
+Pending, Rejected, and Suspended teachers must never appear publicly.
+
+---
+
+20. Database Review
+
+Review schema completely.
+
+Ensure support for:
+
+users
+
+roles
+
+permissions
+
+teacher_profiles
+
+teacher_applications
+
+approval_requests
+
+activity_logs
+
+email_verifications
+
+password_resets
+
+profile_completion
+
+notification_records
+
+Add or modify tables where necessary.
+
+---
+
+21. Prisma Review
+
+Review all models and relationships.
+
+Ensure:
+
+- Proper indexing
+- Proper constraints
+- Proper foreign keys
+- Scalability
+
+---
+
+22. API Review
+
+Review all APIs.
+
+Verify:
+
+- Validation
+- Authorization
+- Security
+- Permission Checks
+
+Every endpoint must respect RBAC.
+
+---
+
+23. UI Review
+
+Review all user-facing screens.
+
+Create or improve:
+
+- Account Type Selection
+- Student Registration
+- Teacher Registration
+- Teacher Application Status
+- Email Verification Screens
+- Password Reset Screens
+- Access Denied Screens
+
+Ensure consistency with existing design system.
+
+---
+
+24. Migration Strategy
+
+If existing users already exist:
+
+Create safe migration strategy.
+
+Requirements:
+
+- No data loss
+- Existing users remain functional
+- Existing permissions remain valid
+
+---
+
+25. Full Verification Pass
+
+After implementation:
+
+Perform a second complete audit.
+
+Review:
+
+- Database
+- Prisma
+- Authentication
+- Authorization
+- Middleware
+- APIs
+- Dashboards
+- Community Systems
+- Teacher Systems
+- Admin Systems
+
+Verify:
+
+No unauthorized actions are possible.
+
+No approval bypasses are possible.
+
+No role escalation vulnerabilities exist.
+
+---
+
+REQUIRED OUTPUT
+
+Do NOT provide only analysis.
+
+Implement the required changes.
+
+Then provide:
+
+1. Files Modified
+2. Files Created
+3. Database Changes
+4. Prisma Changes
+5. API Changes
+6. Middleware Changes
+7. Authentication Changes
+8. Authorization Changes
+9. Teacher Approval Workflow Details
+10. Security Improvements
+11. Migration Details
+12. Remaining Risks
+13. Completion Percentage
+
+The task is NOT complete until the platform fully supports:
+
+- Guest Access Rules
+- Role Based Access Control
+- Student Registration
+- Teacher Registration
+- Teacher Approval Workflow
+- Email Verification
+- Password Recovery
+- Profile Completion
+- Activity Logs
+- Security Hardening
+
+Across the entire project.

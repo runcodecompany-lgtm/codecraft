@@ -3,260 +3,157 @@
 import prisma from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { createClient } from "@/utils/supabase/server"
+import { UserRole } from "@prisma/client"
+import { randomBytes } from "crypto"
 
-// --------------------
-// Category Actions
-// --------------------
-
-export async function createCategory(formData: FormData) {
-  const name = formData.get("name")?.toString()
-  const slug = formData.get("slug")?.toString()
-
-  if (!name || !slug) {
-    return { error: "الاسم والاسم اللطيف مطلوبان" }
-  }
-
-  try {
-    await prisma.category.create({
-      data: { name, slug }
-    })
-
-    revalidatePath("/admin/categories")
-    return { success: true }
-  } catch (error) {
-    if ((error as { code?: string }).code === "P2002") {
-      return { error: "الاسم أو الاسم اللطيف موجود مسبقاً" }
-    }
-    return { error: "حدث خطأ أثناء إنشاء القسم" }
-  }
+function generateReferralCode(): string {
+  return randomBytes(5).toString("hex").toUpperCase()
 }
 
-export async function updateCategory(id: string, formData: FormData) {
-  const name = formData.get("name")?.toString()
-  const slug = formData.get("slug")?.toString()
+// --------------------------------------------------------
+// Auth / User Actions
+// --------------------------------------------------------
 
-  if (!name || !slug) {
-    return { error: "الاسم والاسم اللطيف مطلوبان" }
-  }
-
+/**
+ * Syncs a Supabase authenticated user into the local Prisma DB.
+ * Call this after login/register to ensure the user record exists.
+ */
+export async function syncUserToDatabase() {
   try {
-    await prisma.category.update({
-      where: { id },
-      data: { name, slug }
-    })
+    const supabase = await createClient()
+    const { data: { user: authUser } } = await supabase.auth.getUser()
 
-    revalidatePath("/admin/categories")
-    return { success: true }
-  } catch {
-    return { error: "حدث خطأ أثناء تحديث القسم" }
-  }
-}
+    if (!authUser) return { error: "المستخدم غير مصادق عليه" }
 
-export async function deleteCategory(id: string) {
-  try {
-    await prisma.category.delete({
-      where: { id }
-    })
-
-    revalidatePath("/admin/categories")
-    return { success: true }
-  } catch {
-    return { error: "لا يمكن حذف القسم لأنه يحتوي على أخبار مرتبطة به" }
-  }
-}
-
-// --------------------
-// Post Actions
-// --------------------
-
-type CreatePostData = {
-  title: string
-  slug: string
-  content: string
-  categoryId: string
-  mainImage?: string | null
-  mainImageDescription?: string | null
-  authorId: string
-  keywords?: string[]
-}
-
-export async function createPost(data: CreatePostData) {
-  if (!data.title || !data.slug || !data.content || !data.categoryId) {
-    return { error: "جميع الحقول الأساسية مطلوبة" }
-  }
-
-  try {
-    // التأكد من وجود المستخدم في قاعدة البيانات المحلية (Prisma)
-    // إذا لم يكن موجوداً، نقوم بجلبه من Supabase ومزامنته
     const existingUser = await prisma.user.findUnique({
-      where: { id: data.authorId }
+      where: { id: authUser.id },
     })
 
     if (!existingUser) {
-      const supabase = await createClient()
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-      
-      if (authUser && authUser.id === data.authorId) {
-        // استخراج البيانات من metadata
-        const username = authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user'
-        const email = authUser.email || ''
-        const alias = authUser.user_metadata?.alias || username
-        const role = (authUser.user_metadata?.role as any) || 'WRITER'
+      const email = authUser.email || ""
+      const name = authUser.user_metadata?.name || email.split("@")[0] || "مستخدم جديد"
+      const roleRaw = authUser.user_metadata?.role as string | undefined
+      const role: UserRole =
+        roleRaw && Object.values(UserRole).includes(roleRaw as UserRole)
+          ? (roleRaw as UserRole)
+          : UserRole.STUDENT
 
-        await prisma.user.create({
-          data: {
-            id: authUser.id,
-            username,
-            email,
-            alias,
-            role
-          }
-        })
-      } else {
-        // إذا لم نجد المستخدم في Supabase أيضاً (حالة نادرة جداً)
-        // نقوم بإنشاء مستخدم بسيط لتجنب فشل إنشاء الخبر
-        await prisma.user.create({
-          data: {
-            id: data.authorId,
-            username: `user_${data.authorId.substring(0, 8)}`,
-            email: `${data.authorId}@placeholder.com`,
-            alias: 'كاتب',
-            role: 'WRITER'
-          }
-        })
-      }
-    }
-
-    await prisma.post.create({
-      data: {
-        title: data.title,
-        slug: data.slug,
-        content: data.content,
-        categoryId: data.categoryId,
-        mainImage: data.mainImage ?? undefined,
-        mainImageDescription: data.mainImageDescription ?? undefined,
-        authorId: data.authorId,
-        keywords: data.keywords || [],
-        published: true
-      }
-    })
-
-    // إعادة التحقق من المسارات لتحديث الـ SEO والصفحات العامة فوراً
-    revalidatePath("/")
-    revalidatePath("/sitemap.xml")
-    revalidatePath(`/news/${data.slug}`)
-    revalidatePath("/admin/posts")
-
-    // تنبيه جوجل بوجود تحديث في خريطة الموقع
-    pingGoogle();
-
-    return { success: true }
-  } catch (error) {
-    console.error("Error creating post:", error)
-    return { error: "حدث خطأ أثناء إضافة الخبر" }
-  }
-}
-
-// وظيفة لتنبيه جوجل بوجود تحديث في خريطة الموقع (SEO Ping)
-async function pingGoogle() {
-  const sitemapUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/sitemap.xml`;
-  try {
-    // رابط Google Ping لخرائط المواقع
-    await fetch(`https://www.google.com/ping?sitemap=${encodeURIComponent(sitemapUrl)}`, {
-      method: 'GET',
-      mode: 'no-cors' // جوجل لا يسمح بـ CORS هنا ولكن الطلب سيصل
-    });
-    console.log("Google pinged successfully");
-  } catch (error) {
-    console.error("Error pinging Google:", error);
-  }
-}
-
-type UpdatePostData = {
-  title: string
-  slug: string
-  content: string
-  categoryId: string
-  mainImage?: string | null
-  mainImageDescription?: string | null
-  authorId?: string
-  keywords?: string[]
-}
-
-export async function updatePost(id: string, data: UpdatePostData) {
-  if (!data.title || !data.slug || !data.content || !data.categoryId) {
-    return { error: "جميع الحقول الأساسية مطلوبة" }
-  }
-
-  try {
-    // التأكد من وجود المستخدم (اختياري في التحديث ولكن مفيد للأمان)
-    if (data.authorId) {
-      const existingUser = await prisma.user.findUnique({
-        where: { id: data.authorId }
+      await prisma.user.create({
+        data: {
+          id: authUser.id,
+          email,
+          name,
+          role,
+          referralCode: generateReferralCode(),
+        },
       })
-
-      if (!existingUser) {
-        const supabase = await createClient()
-        const { data: { user: authUser } } = await supabase.auth.getUser()
-        
-        if (authUser && authUser.id === data.authorId) {
-          const username = authUser.user_metadata?.username || authUser.email?.split('@')[0] || 'user'
-          const email = authUser.email || ''
-          const alias = authUser.user_metadata?.alias || username
-          const role = (authUser.user_metadata?.role as any) || 'WRITER'
-
-          await prisma.user.create({
-            data: {
-              id: authUser.id,
-              username,
-              email,
-              alias,
-              role
-            }
-          })
-        }
-      }
     }
-
-    await prisma.post.update({
-      where: { id },
-      data: {
-        title: data.title,
-        slug: data.slug,
-        content: data.content,
-        categoryId: data.categoryId,
-        mainImage: data.mainImage ?? undefined,
-        mainImageDescription: data.mainImageDescription ?? undefined,
-        keywords: data.keywords || [],
-        ...(data.authorId && { authorId: data.authorId })
-      }
-    })
-
-    // إعادة التحقق من المسارات لتحديث الـ SEO والصفحات العامة فوراً
-    revalidatePath("/")
-    revalidatePath("/sitemap.xml")
-    revalidatePath(`/news/${data.slug}`)
-    revalidatePath("/admin/posts")
-
-    // تنبيه جوجل بوجود تحديث في خريطة الموقع
-    pingGoogle();
 
     return { success: true }
   } catch (error) {
-    console.error("Error updating post:", error)
-    return { error: "حدث خطأ أثناء تحديث الخبر" }
+    console.error("Error syncing user to database:", error)
+    return { error: "حدث خطأ أثناء مزامنة بيانات المستخدم" }
   }
 }
 
-export async function deletePost(id: string) {
+// --------------------------------------------------------
+// Course Actions (Admin / Teacher)
+// --------------------------------------------------------
+
+export async function publishCourse(courseId: string) {
   try {
-    await prisma.post.delete({
-      where: { id }
+    await prisma.course.update({
+      where: { id: courseId },
+      data: { isPublished: true },
     })
 
-    revalidatePath("/admin/posts")
+    revalidatePath("/dashboard/teacher/courses")
+    revalidatePath("/")
     return { success: true }
-  } catch {
-    return { error: "حدث خطأ أثناء حذف الخبر" }
+  } catch (error) {
+    console.error("Error publishing course:", error)
+    return { error: "حدث خطأ أثناء نشر الدورة" }
+  }
+}
+
+export async function unpublishCourse(courseId: string) {
+  try {
+    await prisma.course.update({
+      where: { id: courseId },
+      data: { isPublished: false },
+    })
+
+    revalidatePath("/dashboard/teacher/courses")
+    return { success: true }
+  } catch (error) {
+    console.error("Error unpublishing course:", error)
+    return { error: "حدث خطأ أثناء إلغاء نشر الدورة" }
+  }
+}
+
+// --------------------------------------------------------
+// Progress Actions (Student)
+// --------------------------------------------------------
+
+export async function markLessonComplete(lessonId: string) {
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user) return { error: "يجب تسجيل الدخول أولاً" }
+
+    await prisma.userProgress.upsert({
+      where: {
+        userId_lessonId: {
+          userId: user.id,
+          lessonId,
+        },
+      },
+      create: {
+        userId: user.id,
+        lessonId,
+        isCompleted: true,
+      },
+      update: {
+        isCompleted: true,
+      },
+    })
+
+    revalidatePath("/dashboard/student")
+    return { success: true }
+  } catch (error) {
+    console.error("Error marking lesson complete:", error)
+    return { error: "حدث خطأ أثناء تحديث تقدّمك" }
+  }
+}
+
+// --------------------------------------------------------
+// Transaction Actions (Economy)
+// --------------------------------------------------------
+
+export async function awardCoins(userId: string, amount: number, description: string) {
+  try {
+    await prisma.$transaction([
+      prisma.transaction.create({
+        data: {
+          userId,
+          amount,
+          type: "EARN",
+          description,
+        },
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: {
+          craftCoins: { increment: amount },
+        },
+      }),
+    ])
+
+    revalidatePath("/dashboard/student")
+    return { success: true }
+  } catch (error) {
+    console.error("Error awarding coins:", error)
+    return { error: "حدث خطأ أثناء منح العملات" }
   }
 }

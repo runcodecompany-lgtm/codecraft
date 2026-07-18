@@ -1,0 +1,164 @@
+/* ═══════════════════════════════════════════════════════════════
+   CODE CRAFT CORE DESIGN SYSTEM
+   Corporate Premium Design Tokens
+   Version 2.0
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ─── 1. COLOR SYSTEM ─────────────────────────────────────── */
+
+:root {
+  /* Primary: Slate Blue */
+  --ccc-50:  #E8EDF4;
+  --ccc-100: #C5D1E3;
+  --ccc-200: #9EB3D0;
+  --ccc-300: #7695BD;
+  --ccc-400: #587FAD;
+  --ccc-500: #2B4C7E;  /* PRIMARY */
+  --ccc-600: #234064;
+  --ccc-700: #1B3450;
+  --ccc-800: #13283C;
+  --ccc-900: #0B1C28;
+
+  /* Secondary: Sage Green */
+  --ccs-50:  #EDF4EF;
+  --ccs-100: #D1E3D6;
+  --ccs-200: #B0D0B8;
+  --ccs-300: #8FBD9A;
+  --ccs-400: #6EAB7C;
+  --ccs-500: #4A7C59;  /* SECONDARY */
+  --ccs-600: #3A6650;
+  --ccs-700: #2A5047;
+  --ccs-800: #1A3A3E;
+  --ccs-900: #0A2435;
+
+  /* Accent: Warm Amber */
+  --cca-50:  #FFF8E8;
+  --cca-100: #FFEBB5;
+  --cca-200: #FFDD82;
+  --cca-300: #FFCF4F;
+  --cca-400: #FFC11C;
+  --cca-500: #FF9F1C;  /* ACCENT */
+  --cca-600: #E08500;
+  --cca-700: #B86A00;
+  --cca-800: #904F00;
+  --cca-900: #683400;
+
+  /* Neutral Scale */
+  --ccn-50:  #F5F7FA;   /* BG DAY */
+  --ccn-100: #EEF0F5;
+  --ccn-200: #DFE4EC;   /* BORDER */
+  --ccn-300: #C5CCD6;
+  --ccn-400: #A3ACB8;
+  --ccn-500: #7A91A8;   /* TEXT MUTED DARK */
+  --ccn-600: #64748B;   /* TEXT MUTED */
+  --ccn-700: #475569;   /* TEXT MUTED LIGHT */
+  --ccn-800: #334155;
+  --ccn-900: #1E293B;   /* TEXT MAIN */
+
+  /* Semantic Colors */
+  --ccr-50:  #FEF2F2;   /* ERROR/LIGHT */
+  --ccr-500: #D93025;   /* ERROR */
+  --ccr-700: #991B1B;
+
+  --ccg-50:  #F0FDF4;   /* SUCCESS/LIGHT */
+  --ccg-500: #22C55E;   /* SUCCESS */
+  --ccg-700: #15803D;
+
+  --ccw-50:  #FFFBEB;   /* WARNING/LIGHT */
+  --ccw-500: #EAB308;   /* WARNING */
+  --ccw-700: #A16207;
+}
+
+/* ─── 2. TYPOGRAPHY SCALE ──────────────────────────────────── */
+
+:root {
+  --ccc-font-sans: 'Alexandria', 'Cairo', 'Noto Sans Arabic', sans-serif;
+
+  /* Desktop Typography */
+  --ccc-display:     700 28px/36px var(--ccc-font-sans);
+  --ccc-h1:          700 24px/32px var(--ccc-font-sans);
+  --ccc-h2:          700 20px/28px var(--ccc-font-sans);
+  --ccc-h3:          600 16px/24px var(--ccc-font-sans);
+  --ccc-h4:          500 14px/20px var(--ccc-font-sans);
+  --ccc-body:        400 14px/22px var(--ccc-font-sans);
+  --ccc-body-sm:     400 13px/20px var(--ccc-font-sans);
+  --ccc-caption:     400 12px/16px var(--ccc-font-sans);
+  --ccc-label:       700 11px/16px var(--ccc-font-sans);
+  --ccc-micro:       700 10px/14px var(--ccc-font-sans);
+}
+
+/* ─── 3. SPACING SYSTEM ────────────────────────────────────── */
+
+:root {
+  --ccc-space-2xs: 2px;
+  --ccc-space-xs:  4px;
+  --ccc-space-sm:  8px;
+  --ccc-space-md:  16px;
+  --ccc-space-lg:  24px;
+  --ccc-space-xl:  32px;
+  --ccc-space-2xl: 48px;
+  --ccc-space-3xl: 64px;
+  --ccc-space-4xl: 80px;
+}
+
+/* ─── 4. RADIUS SYSTEM ────────────────────────────────────── */
+
+:root {
+  --ccc-radius-none: 0px;
+  --ccc-radius-sm:   4px;
+  --ccc-radius-md:   8px;
+  --ccc-radius-lg:   12px;
+  --ccc-radius-xl:   16px;
+  --ccc-radius-2xl:  20px;
+  --ccc-radius-3xl:  24px;
+  --ccc-radius-full: 9999px;
+}
+
+/* ─── 5. SHADOW & ELEVATION ────────────────────────────────── */
+
+:root {
+  --ccc-shadow-xs:   0 1px 2px rgba(30, 41, 59, 0.04);
+  --ccc-shadow-sm:   0 1px 3px rgba(30, 41, 59, 0.06);
+  --ccc-shadow-md:   0 4px 12px rgba(30, 41, 59, 0.08);
+  --ccc-shadow-lg:   0 8px 24px rgba(30, 41, 59, 0.10);
+  --ccc-shadow-xl:   0 12px 40px rgba(30, 41, 59, 0.14);
+  --ccc-shadow-2xl:  0 24px 64px rgba(30, 41, 59, 0.18);
+
+  /* Colored glows */
+  --ccc-glow-primary:  0 0 24px rgba(43, 76, 126, 0.12);
+  --ccc-glow-secondary: 0 0 24px rgba(74, 124, 89, 0.12);
+  --ccc-glow-accent:   0 0 24px rgba(255, 159, 28, 0.12);
+}
+
+/* ─── 6. TRANSITIONS ───────────────────────────────────────── */
+
+:root {
+  --ccc-duration-fast:    150ms;
+  --ccc-duration-normal:  250ms;
+  --ccc-duration-slow:    400ms;
+  --ccc-ease-out:         cubic-bezier(0, 0, 0.2, 1);
+  --ccc-ease-in-out:      cubic-bezier(0.4, 0, 0.2, 1);
+  --ccc-ease-spring:      cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ─── 7. DARK MODE OVERRIDES ───────────────────────────────── */
+
+.dark {
+  --ccn-50:  #0B1220;   /* BG DARK */
+  --ccn-100: #0D1525;
+  --ccn-200: #1A2540;
+  --ccn-300: #2A3A54;
+  --ccn-400: #3D5068;
+  --ccn-500: #5A6F87;
+  --ccn-600: #7A91A8;   /* TEXT MUTED DARK */
+  --ccn-700: #94A3B8;
+  --ccn-800: #CBD5E1;
+  --ccn-900: #E6EEF6;   /* TEXT MAIN DARK */
+
+  --ccc-shadow-xs:   0 1px 2px rgba(0, 0, 0, 0.3);
+  --ccc-shadow-sm:   0 1px 3px rgba(0, 0, 0, 0.4);
+  --ccc-shadow-md:   0 4px 12px rgba(0, 0, 0, 0.5);
+  --ccc-shadow-lg:   0 8px 24px rgba(0, 0, 0, 0.6);
+  --ccc-shadow-xl:   0 12px 40px rgba(0, 0, 0, 0.7);
+  --ccc-shadow-2xl:  0 24px 64px rgba(0, 0, 0, 0.8);
+}
