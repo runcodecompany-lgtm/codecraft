@@ -67,7 +67,7 @@ export default async function StudentCoursesPage() {
     }
   }
 
-  const initials = (name: string) =>
+  const initials = (name: string | null | undefined) =>
     (name || "?").split(" ").slice(0, 2).map(w => w[0]).join("").toUpperCase()
 
   return (
