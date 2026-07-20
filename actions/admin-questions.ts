@@ -66,7 +66,7 @@ export async function createGlobalQuestionAction(data: unknown) {
 
     const validated = questionSchema.safeParse(data)
     if (!validated.success) {
-      const firstError = validated.error.errors[0]?.message || "البيانات المدخلة غير صالحة."
+      const firstError = validated.error.issues[0]?.message || "البيانات المدخلة غير صالحة."
       return { success: false, error: firstError }
     }
 
@@ -103,7 +103,7 @@ export async function updateGlobalQuestionAction(id: string, data: unknown) {
 
     const validated = questionSchema.safeParse(data)
     if (!validated.success) {
-      const firstError = validated.error.errors[0]?.message || "البيانات المدخلة غير صالحة."
+      const firstError = validated.error.issues[0]?.message || "البيانات المدخلة غير صالحة."
       return { success: false, error: firstError }
     }
 

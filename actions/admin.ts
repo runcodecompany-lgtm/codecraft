@@ -177,16 +177,46 @@ export async function getAdminCourses(status?: string, page: number = 1, limit: 
                 take: limit,
                 include: {
                     teacher: { select: { id: true, name: true } },
-                    track: { select: { id: true, name: true } },
-                    category: { select: { id: true, name: true } },
-                    subcategory: { select: { id: true, name: true } },
+                    track: {
+                        select: {
+                            id: true,
+                            name: true,
+                            parent: {
+                                select: {
+                                    id: true,
+                                    name: true
+                                }
+                            }
+                        }
+                    },
                     _count: { select: { enrollments: true, modules: true } }
                 }
             }),
             prisma.course.count({ where })
         ])
 
-        return { success: true, courses, total, pages: Math.ceil(total / limit) }
+        // Map hierarchical track to category & subcategory for UI compatibility
+        const formattedCourses = courses.map((course: any) => {
+            let category = null
+            let subcategory = null
+
+            if (course.track) {
+                if (course.track.parent) {
+                    category = course.track.parent
+                    subcategory = { id: course.track.id, name: course.track.name }
+                } else {
+                    category = { id: course.track.id, name: course.track.name }
+                }
+            }
+
+            return {
+                ...course,
+                category,
+                subcategory
+            }
+        })
+
+        return { success: true, courses: formattedCourses, total, pages: Math.ceil(total / limit) }
     } catch (error: any) {
         return { success: false, error: error.message || "فشل جلب الدورات." }
     }
