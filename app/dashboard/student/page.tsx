@@ -45,7 +45,7 @@ export default async function StudentDashboardPage() {
         include: {
           course: {
             select: {
-              id: true, title: true, description: true, priceInCoins: true, trackId: true,
+              id: true, title: true, slug: true, description: true, priceInCoins: true, trackId: true,
               modules: { select: { lessons: { select: { id: true } } } },
             },
           },
@@ -603,7 +603,7 @@ export default async function StudentDashboardPage() {
                     transition: "width 0.7s ease",
                   }} />
                 </div>
-                {recommendationsByTrack.get(track.trackId)?.length > 0 && (
+                {(recommendationsByTrack.get(track.trackId)?.length ?? 0) > 0 && (
                   <div style={{ display: "flex", gap: "var(--ccc-space-sm)", marginTop: "var(--ccc-space-sm)", flexWrap: "wrap" }}>
                     {recommendationsByTrack.get(track.trackId)?.slice(0, 2).map((rec) => (
                       <Link
