@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <style>
+    .box { fill:#fff; stroke:#0f172a; stroke-width:2 }
+    .title { font-family: 'Amiri', serif; font-size:18px; fill:#0f172a }
+    .field { font-family: 'Amiri', serif; font-size:14px; fill:#0f172a }
+    .method { font-family: 'Amiri', serif; font-size:12px; fill:#0f172a }
+    .arrow { stroke:#0f172a; stroke-width:2; fill:none; marker-end:url(#arrowhead) }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <!-- User class -->
+  <rect x="50" y="50" width="320" height="160" rx="8" class="box" />
+  <text x="210" y="85" text-anchor="middle" class="title">User</text>
+  <text x="70" y="110" class="field">- id: uuid</text>
+  <text x="70" y="130" class="field">- email: string</text>
+  <text x="70" y="150" class="field">- name: string</text>
+  <text x="70" y="170" class="field">- role: UserRole</text>
+
+  <!-- Course class -->
+  <rect x="400" y="50" width="360" height="140" rx="8" class="box" />
+  <text x="580" y="85" text-anchor="middle" class="title">Course</text>
+  <text x="420" y="115" class="field">- id: uuid</text>
+  <text x="420" y="135" class="field">- title: string</text>
+  <text x="420" y="155" class="field">- teacherId: uuid</text>
+
+  <!-- Enrollment class -->
+  <rect x="820" y="50" width="320" height="120" rx="8" class="box" />
+  <text x="980" y="85" text-anchor="middle" class="title">Enrollment</text>
+  <text x="840" y="115" class="field">- userId: uuid</text>
+  <text x="840" y="135" class="field">- courseId: uuid</text>
+
+  <path d="M370 120 L400 120" class="arrow" />
+  <path d="M760 120 L820 120" class="arrow" />
+
+  <!-- Module -->
+  <rect x="400" y="240" width="360" height="120" rx="8" class="box" />
+  <text x="580" y="270" text-anchor="middle" class="title">Module</text>
+  <text x="420" y="300" class="field">- id: uuid</text>
+  <text x="420" y="320" class="field">- courseId: uuid</text>
+
+  <!-- Lesson -->
+  <rect x="820" y="240" width="320" height="140" rx="8" class="box" />
+  <text x="980" y="270" text-anchor="middle" class="title">Lesson</text>
+  <text x="840" y="300" class="field">- id: uuid</text>
+  <text x="840" y="320" class="field">- moduleId: uuid</text>
+  <text x="840" y="340" class="field">- videoUrl: string</text>
+
+  <path d="M580 190 L580 240" class="arrow" />
+  <path d="M760 300 L820 300" class="arrow" />
+
+  <!-- Quiz -->
+  <rect x="50" y="420" width="320" height="120" rx="8" class="box" />
+  <text x="210" y="455" text-anchor="middle" class="title">Quiz</text>
+  <text x="70" y="485" class="field">- id: uuid</text>
+  <text x="70" y="505" class="field">- lessonId: uuid</text>
+
+  <!-- Question -->
+  <rect x="420" y="420" width="360" height="140" rx="8" class="box" />
+  <text x="600" y="455" text-anchor="middle" class="title">Question</text>
+  <text x="440" y="485" class="field">- id: uuid</text>
+  <text x="440" y="505" class="field">- quizId: uuid</text>
+  <text x="440" y="525" class="field">- questionText: text</text>
+
+  <path d="M370 480 L420 480" class="arrow" />
+
+  <!-- Notes -->
+  <text x="100" y="700" class="method">ملاحظة: يُرجى الرجوع إلى prisma/schema.prisma للحصول على الحقول الكاملة والعلاقات الموسّعة.</text>
+</svg>
