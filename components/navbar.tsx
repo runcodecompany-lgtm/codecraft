@@ -527,12 +527,14 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Mobile Slide-in Drawer Container */}
-        <div
-          className={`lg:hidden fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white dark:bg-slate-900 border-l border-slate-200/60 dark:border-slate-800/80 shadow-2xl z-50 transition-transform duration-300 ease-in-out overflow-y-auto flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"
-            }`}
-          dir="rtl"
-        >
+      </header>
+
+      {/* Mobile Slide-in Drawer Container */}
+      <div
+        className={`lg:hidden fixed top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white dark:bg-slate-900 border-l border-slate-200/60 dark:border-slate-800/80 shadow-2xl z-50 transition-transform duration-300 ease-in-out overflow-y-auto flex flex-col ${isOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        dir="rtl"
+      >
           {/* Drawer Header */}
           <div className="p-4 flex items-center justify-between border-b border-slate-100 dark:border-slate-850">
             <Link href="/" onClick={() => setIsOpen(false)} className="flex items-center gap-2">
@@ -709,9 +711,8 @@ export default function Navbar() {
               )}
             </div>
 
-          </div>
         </div>
-      </header>
+      </div>
     </>
   )
 }
