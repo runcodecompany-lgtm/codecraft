@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { createDetailedCourse } from "@/actions/teacher-course"
+import type { DifficultyLevel } from "@prisma/client"
 import { getLearningTracks } from "@/actions/tracks"
 import { 
   ArrowLeft, Save, Sparkles, BookOpen, Coins, 
@@ -65,6 +66,7 @@ export default function NewCoursePage() {
 
     const res = await createDetailedCourse({
       ...formData,
+      level: formData.level as DifficultyLevel,
       trackId: finalTrackId
     })
     if (res.success) {
