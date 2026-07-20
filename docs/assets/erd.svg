@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <style>
+    .box { fill:#f8fafc; stroke:#0f172a; stroke-width:2 }
+    .title { font-family: 'Amiri', serif; font-size:18px; fill:#0f172a }
+    .field { font-family: 'Amiri', serif; font-size:14px; fill:#0f172a }
+    .arrow { stroke:#0f172a; stroke-width:2; fill:none; marker-end:url(#arrowhead) }
+    text { direction: rtl }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#0f172a" />
+    </marker>
+  </defs>
+
+  <!-- User -->
+  <rect x="50" y="50" width="260" height="120" rx="8" class="box" />
+  <text x="200" y="80" text-anchor="middle" class="title">المستخدم (User)</text>
+  <text x="200" y="105" text-anchor="middle" class="field">id, email, name, role</text>
+  <text x="200" y="125" text-anchor="middle" class="field">craftCoins, xp, createdAt</text>
+
+  <!-- Course -->
+  <rect x="420" y="50" width="300" height="120" rx="8" class="box" />
+  <text x="570" y="80" text-anchor="middle" class="title">الدورة (Course)</text>
+  <text x="570" y="105" text-anchor="middle" class="field">id, title, slug, teacherId</text>
+
+  <!-- Enrollment -->
+  <rect x="780" y="50" width="300" height="80" rx="8" class="box" />
+  <text x="930" y="85" text-anchor="middle" class="title">التسجيل (Enrollment)</text>
+  <text x="930" y="105" text-anchor="middle" class="field">userId, courseId, progress</text>
+
+  <!-- arrows -->
+  <path d="M310 110 L420 110" class="arrow" />
+  <path d="M720 110 L780 110" class="arrow" />
+
+  <!-- Module and Lesson -->
+  <rect x="420" y="220" width="300" height="100" rx="8" class="box" />
+  <text x="570" y="250" text-anchor="middle" class="title">الوحدة (Module)</text>
+  <text x="570" y="275" text-anchor="middle" class="field">id, title, courseId, order</text>
+
+  <rect x="780" y="220" width="300" height="120" rx="8" class="box" />
+  <text x="930" y="250" text-anchor="middle" class="title">الدرس (Lesson)</text>
+  <text x="930" y="275" text-anchor="middle" class="field">id, title, moduleId, videoUrl</text>
+
+  <path d="M570 170 L570 220" class="arrow" />
+  <path d="M720 270 L780 270" class="arrow" />
+
+  <!-- Quiz and Question -->
+  <rect x="50" y="350" width="300" height="100" rx="8" class="box" />
+  <text x="200" y="380" text-anchor="middle" class="title">الاختبار (Quiz)</text>
+  <text x="200" y="405" text-anchor="middle" class="field">id, title, lessonId</text>
+
+  <rect x="420" y="350" width="360" height="120" rx="8" class="box" />
+  <text x="600" y="380" text-anchor="middle" class="title">السؤال (Question)</text>
+  <text x="600" y="405" text-anchor="middle" class="field">id, quizId, questionText, options, correctAnswer</text>
+
+  <path d="M350 400 L420 400" class="arrow" />
+
+  <!-- Transaction -->
+  <rect x="50" y="500" width="300" height="80" rx="8" class="box" />
+  <text x="200" y="535" text-anchor="middle" class="title">المعاملة (Transaction)</text>
+  <text x="200" y="555" text-anchor="middle" class="field">id, userId, amount, type</text>
+
+  <path d="M200 170 L200 350" class="arrow" />
+  <path d="M200 450 L200 500" class="arrow" />
+
+</svg>
